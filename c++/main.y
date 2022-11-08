@@ -1,16 +1,14 @@
 %{
 #include "main.h"
+#include <map>
+#include <string>
 
 extern int yylineno;
 extern int yylex();
 
 void yyerror (const char *s);
 
-int variables[52];
-int getValueID(char id);
-void assigmentValueID(char id, int val);
-void assigmentUnaryValueID(char id, int val, bool isAdd);
-void unaryID(char id, bool isAdd);
+map <char, int> vars;
 %}
 
 %union {
@@ -27,8 +25,8 @@ void unaryID(char id, bool isAdd);
 
 %%
 
-PROGRAM:	PRINT '(' EXPR ')' ';'				{ std::cout << $3 << std::endl; }
-|			PROGRAM PRINT '(' EXPR ')' ';'		{ std::cout << $4 << std::endl; }
+PROGRAM:	PRINT '(' EXPR ')' ';'				{ cout << $3 << endl; }
+|			PROGRAM PRINT '(' EXPR ')' ';'		{ cout << $4 << endl; }
 
 //|			PRINT '(' STRING ')' ';'			{ printf("%s\n", $3); }
 //|			PROGRAM PRINT '(' STRING ')' ';'	{ printf("%s\n", $4); }	
@@ -40,11 +38,11 @@ PROGRAM:	PRINT '(' EXPR ')' ';'				{ std::cout << $3 << std::endl; }
 ;
 
 EXPR:		EXPR1
-|			ID '=' EXPR1						{ assigmentValueID($1, $3); }
-|			ID ADDASSIGMENT EXPR1				{ assigmentUnaryValueID($1, $3, true); }
-|			ID SUBTRACTASSIGMENT EXPR1			{ assigmentUnaryValueID($1, $3, false); }
-|			ID INCREMENT						{ unaryID($1, true); }
-|			ID DECREMENT						{ unaryID($1, false); }
+|			ID '=' EXPR1						{ $$ = $3; vars[$1] = $3; }
+//|			ID ADDASSIGMENT EXPR1				{ assigmentUnaryValueID($1, $3, true); }
+//|			ID SUBTRACTASSIGMENT EXPR1			{ assigmentUnaryValueID($1, $3, false); }
+//|			ID INCREMENT						{ unaryID($1, true); }
+//|			ID DECREMENT						{ unaryID($1, false); }
 ;
 
 EXPR1:		TERM
@@ -60,46 +58,17 @@ TERM:		VAL
 VAL:		'(' EXPR ')'						{ $$ = $2; }
 |			'-' VAL								{ $$ = -$2; }
 |			NUM									{ $$ = $1; }
-|			ID									{ $$ = getValueID($1); }
+|			ID									{
+													if (vars[$1])
+														$$ = vars[$1];
+													else
+														yyerror("Undefined variable");
+												}
 ;
 
 %%
 
-int computeIDIndex(char id) {
-	int idx = -1;
-	if (islower(id)) {
-		idx = id - 'a' + 26;
-	} else if (isupper(id)) {
-		idx = id - 'A';
-	}
-	return idx;
-} 
-
-int getValueID(char id) {
-	int bucket = computeIDIndex(id);
-	return variables[bucket];
-}
-
-void assigmentValueID(char id, int val) {
-	int bucket = computeIDIndex(id);
-	variables[bucket] = val;
-}
-
-void assigmentUnaryValueID(char id, int val, bool isAdd) {
-	int bucket = computeIDIndex(id);
-	int value = getValueID(id);
-	variables[bucket] = isAdd ? value + val : value - val;
-}
-
-void unaryID(char id, bool isAdd) {
-	int bucket = computeIDIndex(id);
-	int value = getValueID(id);
-
-	isAdd ? value ++ : value--;
-	variables[bucket] = value;
-}
-
 void yyerror(const char *s) {
-	std::cout << s << ", line" << yylineno << std::endl;
+	cout << s << ", line " << yylineno << endl;
 	exit(1);
 }

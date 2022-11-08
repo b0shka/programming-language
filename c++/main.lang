@@ -1,21 +1,9 @@
-a = 2;
+a = 12;
 print(a);
 
-// increment
-a++;
-print(a);
-
-a -= 2;
-print(a);
-
-b = 5;
-print(a + b);
-
-b = a + 3 * 2;
+b = 5 + 2;
 print(b);
 
-/*
-decrement
-*/
-b--;
-print(b);
+c = a + b;
+print(c);
+print(c + 10);
