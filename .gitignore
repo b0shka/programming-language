@@ -2,8 +2,7 @@ main
 lex.yy.c
 y.tab.c
 y.tab.h
-update/main
-update/STR
-update/lex.yy.c
-update/y.tab.c
-update/y.tab.h
+c++/main
+c++/lexer.cpp
+c++/parser.cpp
+c++/parser.hpp

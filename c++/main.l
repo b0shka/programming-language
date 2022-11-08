@@ -1,13 +1,14 @@
 %{
-#include "main.tab.h"
+#include "parser.hpp"
 
-void yyerror(char *s);
+void yyerror(const char *s);
 %}
 
 %option yylineno
 
 id				[a-zA-Z_][a-zA-Z0-9_]*
 number			[0-9]+
+blank			[ \t\n]
 string			["].*["]
 charaster		['].*[']
 comment_str		\/\/.*
@@ -27,7 +28,7 @@ comment_strs	\/\*(.*\n)*.*\*\/
 
 {comment_str}					{ ; }
 {comment_strs}					{ ; }
-[ \t\n]							{ ; }
+{blank}							{ ; }
 [-+*/=();]						{ return *yytext; }
 .								{ yyerror("Invalid character"); }
 

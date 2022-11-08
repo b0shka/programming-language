@@ -1,13 +1,10 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <stdbool.h>
+#include "main.h"
 
 extern int yylineno;
 extern int yylex();
-extern FILE *yyin;
-void yyerror (char *s);
+
+void yyerror (const char *s);
 
 int variables[52];
 int getValueID(char id);
@@ -25,13 +22,13 @@ void unaryID(char id, bool isAdd);
 %token PRINT INCREMENT DECREMENT ADDASSIGMENT SUBTRACTASSIGMENT
 %token <id> ID
 %token <num> NUM
-%token <string> STRING
+%token <str> STRING
 %type <num> EXPR EXPR1 TERM VAL
 
 %%
 
-PROGRAM:	PRINT '(' EXPR ')' ';'				{ printf("%d\n", $3); }
-|			PROGRAM PRINT '(' EXPR ')' ';'		{ printf("%d\n", $4); }
+PROGRAM:	PRINT '(' EXPR ')' ';'				{ std::cout << $3 << std::endl; }
+|			PROGRAM PRINT '(' EXPR ')' ';'		{ std::cout << $4 << std::endl; }
 
 //|			PRINT '(' STRING ')' ';'			{ printf("%s\n", $3); }
 //|			PROGRAM PRINT '(' STRING ')' ';'	{ printf("%s\n", $4); }	
@@ -102,23 +99,7 @@ void unaryID(char id, bool isAdd) {
 	variables[bucket] = value;
 }
 
-void yyerror(char *s) {
-	fprintf(stderr, "%s, line %d\n", s, yylineno);
+void yyerror(const char *s) {
+	std::cout << s << ", line" << yylineno << std::endl;
 	exit(1);
-}
-
-int main(int argc, char **argv) {
-	if (argc < 2) {
-		printf("Provide a filename to parse!\n");
-		exit(1);
-	}
-	FILE *sourceFile = fopen(argv[1], "r");
-
-	if (!sourceFile) {
-		printf("Could not open source file %s\n", argv[1]);
-		exit(1);
-	}
-
-	yyin = sourceFile;
-	return yyparse();
 }

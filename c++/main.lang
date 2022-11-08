@@ -1,0 +1,21 @@
+a = 2;
+print(a);
+
+// increment
+a++;
+print(a);
+
+a -= 2;
+print(a);
+
+b = 5;
+print(a + b);
+
+b = a + 3 * 2;
+print(b);
+
+/*
+decrement
+*/
+b--;
+print(b);
