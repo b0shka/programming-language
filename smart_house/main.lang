@@ -1,0 +1,5 @@
+teapot on;
+teapot statistic;
+
+sensor temperature off;
+sensor temperature charge;

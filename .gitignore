@@ -8,3 +8,7 @@ c++/main
 c++/lexer.cpp
 c++/parser.cpp
 c++/parser.hpp
+smart_house/main
+smart_house/lexer.c
+smart_house/parser.c
+smart_house/parser.h
