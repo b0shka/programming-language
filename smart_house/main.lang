@@ -1,5 +1,8 @@
-teapot on;
-teapot statistic;
+add_device("teapot");
+add_device("speaker");
+add_sensor("temperature");
+add_sensor("smoke");
 
-sensor temperature off;
-sensor temperature charge;
+device "teapot" on;
+sensor "temperature" on;
+device "teapot" off;
