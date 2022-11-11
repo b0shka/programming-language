@@ -8,13 +8,13 @@ void yyerror (char *s);
 
 int count_devices = 0;
 int count_sensors = 0;
-char* devices[10];
-char* sensors[10];
+char **sensors = NULL;
+char **devices = NULL;
 
 void add_device(char* name);
 void add_sensor(char* name);
-void print_devices();
-void print_sensors();
+bool check_device(char* name);
+bool check_sensor(char* name);
 %}
 
 %code requires {
@@ -48,16 +48,24 @@ ADD:		ADD_DEVICE VAL						{ add_device($2); }
 ;
 
 ACTIONS:	DEVICE VAL ACTION_JOB				{
-													if ($3)
-														printf("[DEVICE %s] on\n", $2);
+													if (check_device($2)) {
+														if ($3)
+															printf("[DEVICE %s] on\n", $2);
+														else
+															printf("[DEVICE %s] off\n", $2);
+													}
 													else
-														printf("[DEVICE %s] off\n", $2);
+														yyerror("Device not found");
 												}
 |			SENSOR VAL ACTION_JOB				{
-													if ($3)
-														printf("[SENSOR %s] on\n", $2);
+													if (check_sensor($2)) {
+														if ($3)
+															printf("[SENSOR %s] on\n", $2);
+														else
+															printf("[SENSOR %s] off\n", $2); 
+													}
 													else
-														printf("[SENSOR %s] off\n", $2); 
+														yyerror("Sensor not found");
 												}
 ;
 
@@ -68,29 +76,31 @@ VAL:		'(' QUOTE NAME QUOTE ')'			{ $$ = $3; }
 %%
 
 void add_device(char* name) {
-	devices[count_devices] = name;
-	count_devices++;
-	print_devices();
+	devices = (char**)realloc(devices, sizeof(char*) * (count_devices+1));
+	devices[count_devices++] = strdup(name);
 }
 
 void add_sensor(char* name) {
-	sensors[count_sensors] = name;
-	count_sensors++;
-	print_sensors();
+	sensors = (char**)realloc(sensors, sizeof(char*) * (count_sensors+1));
+	sensors[count_sensors++] = strdup(name);
 }
 
-void print_devices() {
+bool check_device(char* name) {
 	for (int i = 0; i < count_devices; i++) {
-		printf("%s ", devices[i]);
+		if (strcmp(devices[i], name) == 0)
+			return true;
 	}
-	printf("\n");
+
+	return false;
 }
 
-void print_sensors() {
+bool check_sensor(char* name) {
 	for (int i = 0; i < count_sensors; i++) {
-		printf("%s ", sensors[i]);
+		if (strcmp(sensors[i], name) == 0)
+			return true;
 	}
-	printf("\n");
+
+	return false;
 }
 
 void yyerror(char *s) {
