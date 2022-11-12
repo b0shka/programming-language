@@ -44,6 +44,8 @@ ACTIONS:	DEVICE VAL ACTION_JOB				{
 															turn_on_device(&$2);
 														else
 															turn_off_device(&$2);
+
+														overwriting_data_file();
 													}
 													else
 														yyerror("Device not found");
@@ -54,6 +56,8 @@ ACTIONS:	DEVICE VAL ACTION_JOB				{
 															turn_on_sensor(&$2);
 														else
 															turn_off_sensor(&$2);
+
+														overwriting_data_file();
 													}
 													else
 														yyerror("Sensor not found");

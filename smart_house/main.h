@@ -24,4 +24,5 @@ void turn_off_device(char **name);
 void turn_on_sensor(char **name);
 void turn_off_sensor(char **name);
 
-void write_data_file(char *type, char *name, char *job_status);
+void write_data_file(char *type, char **name, char *job_status);
+void overwriting_data_file();

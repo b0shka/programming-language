@@ -26,7 +26,7 @@ void add_device(char **name) {
 	devices = (struct Device*)realloc(devices, sizeof(struct Device) * (count_devices+1));
 	devices[count_devices++] = device;
 
-	write_data_file("DEVICE", *name, "off");
+	write_data_file("DEVICE", name, "off");
 }
 
 
@@ -35,7 +35,7 @@ void add_sensor(char **name) {
 	sensors = (struct Sensor*)realloc(sensors, sizeof(struct Sensor) * (count_sensors+1));
 	sensors[count_sensors++] = sensor;
 
-	write_data_file("SENSOR", *name, "off");
+	write_data_file("SENSOR", name, "off");
 }
 
 
@@ -133,13 +133,35 @@ void turn_off_sensor(char **name) {
 }
 
 
-void write_data_file(char *type, char *name, char *job_status) {
+void write_data_file(char *type, char **name, char *job_status) {
 	FILE *file;
 	if (!(file = fopen(PATH_FILE_DATA, "a")))
 		yyerror("Failed to write data to file");
 
-	fprintf(file, "%s %s %s\n", type, name, job_status);
+	fprintf(file, "%s %s %s\n", type, *name, job_status);
 	fclose(file);
+}
+
+
+void overwriting_data_file() {
+	FILE *file;
+	if (!(file = fopen(PATH_FILE_DATA, "w")))
+		yyerror("Failed to write data to file");
+	fclose(file);
+
+	for (int i = 0; i < count_devices; i++) {
+		if (devices[i].job_status)
+			write_data_file("DEVICE", &devices[i].name, "on");
+		else
+			write_data_file("DEVICE", &devices[i].name, "off");
+	}
+
+	for (int i = 0; i < count_sensors; i++) {
+		if (sensors[i].job_status)
+			write_data_file("SENSOR", &sensors[i].name, "on");
+		else
+			write_data_file("SENSOR", &sensors[i].name, "off");
+	}
 }
 
 
