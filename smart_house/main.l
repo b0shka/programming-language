@@ -6,11 +6,14 @@ void yyerror(char *s);
 
 %option yylineno
 
+filename		[a-zA-Z0-9\/.-]+
 name			[a-zA-Z_][a-zA-Z0-9_]*
 comment_str		\/\/.*
 comment_strs	\/\*(.*\n)*.*\*\/
 
 %%
+
+PATH_FILE						{ return PATH_FILE; }
 
 add_device						{ return ADD_DEVICE; }
 add_sensor						{ return ADD_SENSOR; }
@@ -21,13 +24,13 @@ device|DEVICE					{ return DEVICE; }
 sensor|SENSOR					{ return SENSOR; }
 on								{ yylval.job_status = true; return ACTION_JOB; }
 off								{ yylval.job_status = false; return ACTION_JOB; }
-{name}							{ yylval.name = strdup(yytext); return NAME; }
+{name}|{filename}				{ yylval.name = strdup(yytext); return NAME; }
 \"								{ return QUOTE; }
 
 {comment_str}					{ ; }
 {comment_strs}					{ ; }
 [ \t\n]							{ ; }
-[();]							{ return *yytext; }
+[()=;]							{ return *yytext; }
 .								{ yyerror("Invalid character"); }
 
 %%

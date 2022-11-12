@@ -2,12 +2,17 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+
 
 extern FILE *yyin;
 extern int yylineno;
 extern int yylex();
 
+
 void yyerror(char *s);
+
+void update_path_file();
 
 void add_device(char **name);
 void add_sensor(char **name);
@@ -26,3 +31,5 @@ void turn_off_sensor(char **name);
 
 void write_data_file(char *type, char **name, char *job_status);
 void overwriting_data_file();
+
+void logger(char *type, char *action, char **name);

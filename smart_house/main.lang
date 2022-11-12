@@ -1,3 +1,5 @@
+PATH_FILE = "data.txt";
+
 add_device("teapot");
 add_device("speaker");
 add_sensor("temperature");

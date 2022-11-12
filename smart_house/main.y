@@ -11,12 +11,11 @@
 	char* name;
 }
 
-%token ADD_DEVICE ADD_SENSOR GET_DEVICE GET_SENSOR DEVICE SENSOR QUOTE 
+%token PATH_FILE ADD_DEVICE ADD_SENSOR GET_DEVICE GET_SENSOR DEVICE SENSOR QUOTE 
 %token<name> NAME
 %token<job_status> ACTION_JOB
 
-%type COMMANDS COMMAND ADD ACTIONS
-%type GET
+%type COMMANDS COMMAND PATH ADD ACTIONS GET
 %type<name> VAL
 
 %%
@@ -25,9 +24,13 @@ COMMANDS:
 |			COMMANDS COMMAND ';'
 ;
 
-COMMAND:	ADD
+COMMAND:	PATH
+|			ADD
 |			GET
 |			ACTIONS
+;
+
+PATH:		PATH_FILE '=' VAL					{ update_path_file(&$3); }
 ;
 
 ADD:		ADD_DEVICE VAL						{ add_device(&$2); }
