@@ -6,3 +6,6 @@ add_sensor("smoke");
 device "teapot" on;
 sensor "temperature" on;
 device "teapot" off;
+
+//get_device("teapot");
+//get_sensor("smoke");

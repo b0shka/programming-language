@@ -1,0 +1,4 @@
+DEVICE teapot off
+DEVICE speaker off
+SENSOR temperature off
+SENSOR smoke off

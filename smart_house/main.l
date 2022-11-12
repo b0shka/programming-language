@@ -14,9 +14,11 @@ comment_strs	\/\*(.*\n)*.*\*\/
 
 add_device						{ return ADD_DEVICE; }
 add_sensor						{ return ADD_SENSOR; }
+get_device						{ return GET_DEVICE; }
+get_sensor						{ return GET_SENSOR; }
 
-device							{ return DEVICE; }
-sensor							{ return SENSOR; }
+device|DEVICE					{ return DEVICE; }
+sensor|SENSOR					{ return SENSOR; }
 on								{ yylval.job_status = true; return ACTION_JOB; }
 off								{ yylval.job_status = false; return ACTION_JOB; }
 {name}							{ yylval.name = strdup(yytext); return NAME; }
