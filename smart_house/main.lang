@@ -8,6 +8,7 @@ add_sensor("smoke");
 device "teapot" on;
 sensor "temperature" on;
 device "teapot" off;
+device "speaker" on;
 
-//get_device("teapot");
-//get_sensor("smoke");
+//speaker = get_device("speaker");
+//smoke = get_sensor("smoke");

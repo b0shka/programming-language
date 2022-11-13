@@ -2,8 +2,6 @@
 #include "parser.h"
 
 
-char *PATH_FILE_DATA = "data.txt";
-char *PATH_FILE_LOGGER = "info.log";
 int count_devices = 0;
 int count_sensors = 0;
 struct Sensor *sensors = NULL;
@@ -22,7 +20,7 @@ struct Sensor {
 
 
 void update_path_file(char **new_path) {
-	//::PATH_FILE_DATA = *new_path;
+	G_PATH_FILE_DATA = *new_path;
 }
 
 
@@ -150,7 +148,7 @@ void turn_off_sensor(char **name) {
 
 void write_data_file(char *type, char **name, char *job_status) {
 	FILE *file;
-	if (!(file = fopen(PATH_FILE_DATA, "a")))
+	if (!(file = fopen(G_PATH_FILE_DATA, "a")))
 		yyerror("Failed to write data to file");
 
 	fprintf(file, "%s %s %s\n", type, *name, job_status);
@@ -160,7 +158,7 @@ void write_data_file(char *type, char **name, char *job_status) {
 
 void overwriting_data_file() {
 	FILE *file;
-	if (!(file = fopen(PATH_FILE_DATA, "w")))
+	if (!(file = fopen(G_PATH_FILE_DATA, "w")))
 		yyerror("Failed to write data to file");
 	fclose(file);
 
@@ -184,7 +182,7 @@ void logger(char *type, char *action, char **name) {
 	char *format_time;
 	FILE *file;
 
-	if (!(file = fopen(PATH_FILE_LOGGER, "a")))
+	if (!(file = fopen(G_PATH_FILE_LOG, "a")))
 		yyerror("Failed to write data to file");
 
 	long int time_now = time(NULL);

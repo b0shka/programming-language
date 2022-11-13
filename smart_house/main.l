@@ -6,7 +6,7 @@ void yyerror(char *s);
 
 %option yylineno
 
-filename		[a-zA-Z0-9\/.-]+
+filename		[.+]?[.+]?[\/]?[a-zA-Z_][a-zA-Z0-9_\/.-]+
 name			[a-zA-Z_][a-zA-Z0-9_]*
 comment_str		\/\/.*
 comment_strs	\/\*(.*\n)*.*\*\/

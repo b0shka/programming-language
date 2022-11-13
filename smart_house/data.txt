@@ -1,4 +1,4 @@
 DEVICE teapot off
-DEVICE speaker off
+DEVICE speaker on
 SENSOR temperature on
 SENSOR smoke off

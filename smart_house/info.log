@@ -1,7 +1,8 @@
-[INFO][Sun Nov 13 00:30:11 2022] <teapot>:3: add new device
-[INFO][Sun Nov 13 00:30:11 2022] <speaker>:4: add new device
-[INFO][Sun Nov 13 00:30:11 2022] <temperature>:5: add new sensor
-[INFO][Sun Nov 13 00:30:11 2022] <smoke>:6: add new sensor
-[INFO][Sun Nov 13 00:30:11 2022] <teapot>:8: turn on device
-[INFO][Sun Nov 13 00:30:11 2022] <temperature>:9: turn on sensor
-[INFO][Sun Nov 13 00:30:11 2022] <teapot>:10: turn off device
+[INFO][Sun Nov 13 13:21:29 2022] <teapot>:3: add new device
+[INFO][Sun Nov 13 13:21:29 2022] <speaker>:4: add new device
+[INFO][Sun Nov 13 13:21:29 2022] <temperature>:5: add new sensor
+[INFO][Sun Nov 13 13:21:29 2022] <smoke>:6: add new sensor
+[INFO][Sun Nov 13 13:21:29 2022] <teapot>:8: turn on device
+[INFO][Sun Nov 13 13:21:29 2022] <temperature>:9: turn on sensor
+[INFO][Sun Nov 13 13:21:29 2022] <teapot>:10: turn off device
+[INFO][Sun Nov 13 13:21:29 2022] <speaker>:11: turn on device
