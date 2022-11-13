@@ -1,14 +1,22 @@
-PATH_FILE = "data.txt";
+PATH_FILE = "data.txt"
 
-add_device("teapot");
-add_device("speaker");
-add_sensor("temperature");
-add_sensor("smoke");
+add_device("teapot")
+add_device("speaker")
+add_sensor("temperature")
+add_sensor("smoke")
 
-device "teapot" on;
-sensor "temperature" on;
-device "teapot" off;
-device "speaker" on;
+device "teapot" on
+sensor "temperature" on
+device "teapot" off
+device "speaker" on
+device "speaker" off
 
-//speaker = get_device("speaker");
-//smoke = get_sensor("smoke");
+speaker = get_device("speaker")
+if (speaker -> job_status) {
+	device "speaker" off
+}
+else {
+	device "speaker" on
+}
+
+//smoke = get_sensor("smoke")

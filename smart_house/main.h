@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -11,14 +13,28 @@ extern int yylineno;
 extern int yylex();
 
 
-void yyerror(char *s);
+struct Device {
+	char *name;
+	bool job_status;
+};
 
-void update_path_file();
+struct Sensor {
+	char *name;
+	bool job_status;
+};
+
+struct Variable {
+	char *name;
+	struct Device *device;
+};
+
+
+void yyerror(char *s);
 
 void add_device(char **name);
 void add_sensor(char **name);
-void get_device(char **name);
-void get_sensor(char **name);
+struct Device* get_device(char **name);
+struct Sensor* get_sensor(char **name);
 
 int get_index_device(char **name);
 int get_index_sensor(char **name);
@@ -34,3 +50,6 @@ void write_data_file(char *type, char **name, char *job_status);
 void overwriting_data_file();
 
 void logger(char *type, char *action, char **name);
+
+void add_var_device(char **name, struct Device *device);
+struct Variable* get_var_by_name(char **name);

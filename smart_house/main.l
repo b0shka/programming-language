@@ -22,15 +22,20 @@ get_sensor						{ return GET_SENSOR; }
 
 device|DEVICE					{ return DEVICE; }
 sensor|SENSOR					{ return SENSOR; }
+if								{ return IF; }
+else							{ return ELSE; }
+job_status						{ return JOB_STATUS; }
 on								{ yylval.job_status = true; return ACTION_JOB; }
 off								{ yylval.job_status = false; return ACTION_JOB; }
-{name}|{filename}				{ yylval.name = strdup(yytext); return NAME; }
+{name}							{ yylval.name = strdup(yytext); return NAME; }
+{filename}						{ yylval.filename = strdup(yytext); return FILENAME; }
 \"								{ return QUOTE; }
+->								{ return ARG; }
 
 {comment_str}					{ ; }
 {comment_strs}					{ ; }
 [ \t\n]							{ ; }
-[()=;]							{ return *yytext; }
+[(){}=]							{ return *yytext; }
 .								{ yyerror("Invalid character"); }
 
 %%

@@ -4,24 +4,10 @@
 
 int count_devices = 0;
 int count_sensors = 0;
+int count_variables = 0;
 struct Sensor *sensors = NULL;
 struct Device *devices = NULL;
-
-
-struct Device {
-	char *name;
-	bool job_status;
-};
-
-struct Sensor {
-	char *name;
-	bool job_status;
-};
-
-
-void update_path_file(char **new_path) {
-	G_PATH_FILE_DATA = *new_path;
-}
+struct Variable *variables = NULL;
 
 
 void add_device(char **name) {
@@ -44,17 +30,17 @@ void add_sensor(char **name) {
 }
 
 
-void get_device(char **name) {
+struct Device* get_device(char **name) {
 	int index = get_index_device(name);
 	if (index != -1)
-		printf("%s\n", devices[index].name);
+		return &devices[index];
 }
 
 
-void get_sensor(char **name) {
+struct Sensor* get_sensor(char **name) {
 	int index = get_index_sensor(name);
 	if (index != -1)
-		printf("%s \n", sensors[index].name);
+		return &sensors[index];
 }
 
 
@@ -193,6 +179,23 @@ void logger(char *type, char *action, char **name) {
 }
 
 
+void add_var_device(char **name, struct Device *device) {
+	const struct Variable var = {*name, device};
+	variables = (struct Variable*)realloc(variables, sizeof(struct Variable) * (count_variables+1));
+	variables[count_variables++] = var;
+
+	logger("INFO", "add new device variable", &device->name);
+}
+
+
+struct Variable* get_var_by_name(char **name) {
+	for (int i = 0; i < count_variables; i++) {
+		if (strcmp(variables[i].name, *name) == 0)
+			return &variables[i];
+	}
+}
+
+
 void yyerror(char *s) {
 	fprintf(stderr, "%s, line %d\n", s, yylineno);
 	exit(1);
@@ -216,6 +219,7 @@ int main(int argc, char **argv) {
 
 	free(devices);
 	free(sensors);
+	free(variables);
 
 	return 1;
 }
