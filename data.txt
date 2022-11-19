@@ -1,0 +1,4 @@
+teapot off
+speaker on
+smoke on
+temperature on

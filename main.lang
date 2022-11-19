@@ -1,21 +1,19 @@
-a = 2;
-print(a);
+PATH_FILE = "data.txt"
 
-// increment
-a++;
-print(a);
+add_device("teapot")
+add_device("speaker")
+add_device("smoke")
+add_device("temperature")
 
-a -= 2;
-print(a);
-
-b = 5;
-print(a + b);
-
-b = a + 3 - (45 - 50);
-print(b);
+device "teapot" on time 12:00
+device "temperature" on
+device "speaker" on
+device "speaker" off time 11:30
+device "temperature" off time 12:10
+device "smoke" on
 
 /*
-decrement
+if isAlarm("smoke") {
+	device "smoke" off
+}
 */
-b--;
-print(b);
