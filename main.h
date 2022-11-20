@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 #include "config/config.h"
 
 
@@ -34,9 +35,15 @@ void turn_on_device(char *name);
 void turn_off_device(char *name);
 
 void add_event(struct Event *event);
+void remove_event(int indexToRemove);
+int get_index_action(char *name);
 
 void clean_file();
 void write_data_file(char *name, char *job_status);
 void overwriting_data_file();
 
 void logger(char *type, char *action, char *name);
+char* get_time(char *format);
+
+void monitoring();
+void monitoring_events();

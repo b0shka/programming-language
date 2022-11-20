@@ -35,6 +35,7 @@ off								{ yylval.job_status = false; return ACTION_JOB; }
 [ \t\n]							{ ; }
 
 [(){}=]							{ return *yytext; }
+<<EOF>>							{ return END_STR; }
 .								{ yyerror("Invalid character"); }
 
 %%

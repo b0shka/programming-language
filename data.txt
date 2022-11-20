@@ -1,4 +1,4 @@
 teapot off
-speaker on
+speaker off
+temperature off
 smoke on
-temperature on

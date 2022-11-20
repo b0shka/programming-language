@@ -2,18 +2,22 @@ PATH_FILE = "data.txt"
 
 add_device("teapot")
 add_device("speaker")
-add_device("smoke")
 add_device("temperature")
+add_device("smoke")
 
-device "teapot" on time 12:00
-device "temperature" on
-device "speaker" on
-device "speaker" off time 11:30
-device "temperature" off time 12:10
 device "smoke" on
+device "speaker" on time 18:06
+device "temperature" on time 18:06
+device "teapot" on time 18:06
+device "speaker" off time 18:06
+device "temperature" off time 18:06
 
 /*
 if isAlarm("smoke") {
+	device "smoke" off
+}
+
+if "smoke" -> alarm {
 	device "smoke" off
 }
 */
