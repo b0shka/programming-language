@@ -7,8 +7,8 @@ add_device("doorbell")
 add_device("door")
 add_device("temperature")
 add_device("smoke")
+add_device("vacuum_cleaner")
 
-device "teapot" on
 device "conditioner" on
 device "speaker" on
 device "door" on
@@ -16,17 +16,22 @@ device "doorbell" on
 device "temperature" on
 device "smoke" on
 
-/*
-if "doorbell" -> call {
+//device "conditioner" target 24
+device "teapot" boil time 7:00
+device "vacuum_cleaner" vacuum time 15:00
+
+if "doorbell" {
 	device "door" open
 }
 
-if "smoke" -> alarm {
+/*
+if "smoke" {
 	device "speaker" sos
 }
 */
 
-device "teapot" off  time 23:00
+device "door" close time 23:00
+
 device "conditioner" off time 23:00
 device "speaker" off time 23:00
 device "doorbell" off time 23:00

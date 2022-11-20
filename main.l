@@ -12,7 +12,7 @@ filename		[.+]?[.+]?[\/]?[a-zA-Z_][a-zA-Z0-9_\/.-]+
 name			[a-zA-Z_][a-zA-Z0-9_]*
 comment_str		\/\/.*
 comment_strs	\/\*(.*\n)*.*\*\/
-actions			on|off|open|call|target|get_value|alarm
+actions			on|off|open|close|call|target|get_value|alarm|vacuum|boil
 
 %%
 
@@ -24,6 +24,7 @@ if								{ return IF; }
 else							{ return ELSE; }
 
 {actions}						{ yylval.action = strdup(yytext); return ACTION; }
+{number}						{ yylval.num = atoi(yytext); return NUMBER; }
 {time}							{ yylval.time = strdup(yytext); return TIME_VALUE; }
 {name}							{ yylval.name = strdup(yytext); return NAME; }
 {filename}						{ yylval.filename = strdup(yytext); return FILENAME; }
