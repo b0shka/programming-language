@@ -12,9 +12,13 @@ int q_count_events = -1;
 int m_count_events = 0;
 int q_count_settings = -1;
 int m_count_settings = 0;
+int q_count_conditions = -1;
+int m_count_conditions = 0;
 
 struct Device *devices = NULL;
 struct Event *events = NULL;
+struct Settings *settings_devices = NULL;
+struct Condition *conditions = NULL;
 struct AviableDevice aviable_devices[] = {
 	"teapot", {"boil"}, {},
 	"conditioner", {"on", "off", "target"}, {},
@@ -25,7 +29,6 @@ struct AviableDevice aviable_devices[] = {
 	"speaker", {"on", "off", "sos"}, {},
 	"vacuum_cleaner", {"vacuum"}, {},
 };
-struct Settings *settings_devices = NULL;
 
 
 void yyerror(char *s) {
@@ -65,18 +68,6 @@ void processing_actions(struct Event *event) {
 	}
 	else
 		yyerror("This action is not supported");
-}
-
-
-bool checking_condition(char *name) {
-	int index = get_index_device(name);
-	if (index != -1) {
-		if (devices[index].state)
-			return true;
-		return false;
-	}
-	else
-		yyerror("Failed get index device");
 }
 
 
@@ -406,6 +397,34 @@ char* get_time(char *format) {
 }
 
 
+bool checking_condition(char *name) {
+	int index = get_index_device(name);
+	if (index != -1) {
+		if (devices[index].state)
+			return true;
+		return false;
+	}
+	else
+		yyerror("Failed get index device");
+}
+
+
+void add_condition(char *name, struct Event *event) {
+	q_count_conditions++;
+	struct Condition condition = {strdup(name), event};
+
+	if (q_count_conditions >= m_count_conditions) {
+		if (m_count_conditions == 0)
+			m_count_conditions++;
+		m_count_conditions *= 2;
+		conditions = (struct Condition*)realloc(conditions, sizeof(struct Condition) * m_count_conditions);
+	}
+	conditions[q_count_conditions] = condition;
+
+	logger("INFO", "added a new condition", name);
+}
+
+
 void monitoring_events() {
 	for (int i = 0; i <= q_count_events; i++) {
 		char *time_ = get_time("%H:%M");
@@ -429,7 +448,7 @@ void monitoring_events() {
 
 
 void monitoring_settings() {
-	
+
 }
 
 

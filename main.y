@@ -15,15 +15,15 @@
 	struct Event *event;
 }
 
-%token PATH ADD DEVICE END_STR
-%token TIME QUOTE IF ELSE 
+%token PATH ADD DEVICE END
+%token TIME QUOTE IF ELSE ARROW
 %token<name> NAME
 %token<filename> FILENAME
 %token<time> TIME_VALUE
 %token<num> NUMBER
 %token<action> ACTION
 
-%type COMMANDS COMMAND OP END
+%type COMMANDS COMMAND OP
 %type<event> ACTIONS
 %type<name> VAL
 
@@ -37,10 +37,11 @@ COMMANDS:
 COMMAND:	PATH '=' QUOTE FILENAME QUOTE				{ G_PATH_FILE_OUTPUT = $4; }
 |			ADD VAL										{ add_device($2); }
 |			ACTIONS										{ processing_actions($1); }
-|			END
+|			END											{ monitoring(); }
 ;
 
-OP:			IF VAL '{' ACTIONS '}'						{ 
+OP:			IF VAL ARROW ACTIONS						{ 
+															add_condition($2, $4);
 															if (checking_condition($2))
 																processing_actions($4);
  														}
@@ -62,7 +63,5 @@ ACTIONS:	DEVICE VAL									{
 VAL:		'(' QUOTE NAME QUOTE ')'					{ $$ = strdup($3); }
 |			QUOTE NAME QUOTE							{ $$ = strdup($2); }
 ;
-
-END:		END_STR										{ monitoring(); }
 
 %%

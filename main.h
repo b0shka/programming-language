@@ -34,6 +34,11 @@ struct Event {
 	int target;
 };
 
+struct Condition {
+	char *name;
+	struct Event *event;
+};
+
 struct Settings {
 	char *name;
 	bool state;
@@ -42,7 +47,6 @@ struct Settings {
 
 void yyerror(char *s);
 void processing_actions();
-bool checking_condition(char *name);
 
 int get_index_aviable_device(char *name);
 bool check_action_on_aviable(char *name, char *action);
@@ -74,6 +78,9 @@ int get_index_settings_device(char *name);
 
 void logger(char *type, char *action, char *name);
 char* get_time(char *format);
+
+bool checking_condition(char *name);
+void add_condition(char *name, struct Event *event);
 
 void monitoring_events();
 void monitoring_settings();

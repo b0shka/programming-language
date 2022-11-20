@@ -16,7 +16,7 @@ actions			on|off|open|close|call|target|get_value|alarm|vacuum|boil
 
 %%
 
-PATH_FILE						{ return PATH; }
+FILE_OUTPUT						{ return PATH; }
 add_device						{ return ADD; }
 device|DEVICE					{ return DEVICE; }
 time|TIME						{ return TIME; }
@@ -30,13 +30,14 @@ else							{ return ELSE; }
 {filename}						{ yylval.filename = strdup(yytext); return FILENAME; }
 
 \"								{ return QUOTE; }
+->								{ return ARROW; }
 
 {comment_str}					{ ; }
 {comment_strs}					{ ; }
 [ \t\n]							{ ; }
 
-[(){}=]							{ return *yytext; }
-<<EOF>>							{ return END_STR; }
+[()=]							{ return *yytext; }
+<<EOF>>							{ return END; }
 .								{ yyerror("Invalid character"); }
 
 %%

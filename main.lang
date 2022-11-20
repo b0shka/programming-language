@@ -1,4 +1,4 @@
-PATH_FILE = "data.txt"
+FILE_OUTPUT = "data.txt"
 
 add_device("teapot")
 add_device("conditioner")
@@ -20,15 +20,8 @@ device "smoke" on
 device "teapot" boil time 7:00
 device "vacuum_cleaner" vacuum time 15:00
 
-if "doorbell" {
-	device "door" open
-}
-
-/*
-if "smoke" {
-	device "speaker" sos
-}
-*/
+if "doorbell" -> device "door" open
+//if "smoke" -> device "speaker" sos
 
 device "door" close time 23:00
 
