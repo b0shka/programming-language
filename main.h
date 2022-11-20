@@ -14,6 +14,13 @@ extern int yylineno;
 extern int yylex();
 
 
+struct AviableDevice {
+	char *name;
+	char *actions[3];
+	char *states[1];
+};
+
+
 struct Device {
 	char *name;
 	bool job_status;
@@ -28,8 +35,11 @@ struct Event {
 
 void yyerror(char *s);
 
+int get_index_aviable_device(char *name);
+bool check_action_on_aviable(char *name, char *action);
+bool check_state_on_aviable(char *name, char *state);
+
 void add_device(char *name);
-bool check_device(char *name);
 int get_index_device(char *name);
 void turn_on_device(char *name);
 void turn_off_device(char *name);

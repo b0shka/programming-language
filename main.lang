@@ -1,23 +1,35 @@
 PATH_FILE = "data.txt"
 
 add_device("teapot")
+add_device("conditioner")
 add_device("speaker")
+add_device("doorbell")
+add_device("door")
 add_device("temperature")
 add_device("smoke")
 
+device "teapot" on
+device "conditioner" on
+device "speaker" on
+device "door" on
+device "doorbell" on
+device "temperature" on
 device "smoke" on
-device "speaker" on time 18:06
-device "temperature" on time 18:06
-device "teapot" on time 18:06
-device "speaker" off time 18:06
-device "temperature" off time 18:06
 
 /*
-if isAlarm("smoke") {
-	device "smoke" off
+if "doorbell" -> call {
+	device "door" open
 }
 
 if "smoke" -> alarm {
-	device "smoke" off
+	device "speaker" sos
 }
 */
+
+device "teapot" off  time 23:00
+device "conditioner" off time 23:00
+device "speaker" off time 23:00
+device "doorbell" off time 23:00
+device "door" off time 23:00
+device "temperature" off time 23:00
+device "smoke" off time 23:00

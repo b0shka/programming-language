@@ -2,6 +2,10 @@
 #include "parser.h"
 
 
+#define COUNT_DEVICES 8
+#define COUNT_ACTIONS 3
+#define COUNT_STATES 1
+
 int q_count_devices = -1;
 int m_count_devices = 0;
 int q_count_events = -1;
@@ -9,11 +13,53 @@ int m_count_events = 0;
 
 struct Device *devices = NULL;
 struct Event *events = NULL;
+struct AviableDevice aviable_devices[] = {
+	"teapot", {"on", "off"}, {},
+	"conditioner", {"on", "off", "target"}, {},
+	"doorbell", {"on", "off"}, {"call"},
+	"door", {"on", "off", "open"}, {},
+	"temperature", {"on", "off"}, {"get_value"},
+	"smoke", {"on", "off"}, {"alarm"},
+	"speaker", {"on", "off"}, {},
+	"vacuum_cleaner", {"on", "off"}, {},
+};
 
 
 void yyerror(char *s) {
 	fprintf(stderr, "%s, line %d\n", s, yylineno);
 	exit(1);
+}
+
+
+int get_index_aviable_device(char *name) {
+	for (int i = 0; i < COUNT_DEVICES; i++) {
+		if (strcmp(aviable_devices[i].name, name) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+bool check_action_on_aviable(char *name, char *action) {
+	int index = get_index_aviable_device(name);
+
+	for (int i = 0; i < COUNT_ACTIONS; i++) {
+		if (aviable_devices[index].actions[i] && strcmp(aviable_devices[index].actions[i], action) == 0)
+			return true;
+	}
+	return false;
+}
+
+
+bool check_state_on_aviable(char *name, char *state) {
+	int index = get_index_aviable_device(name);
+
+	for (int i = 0; i < COUNT_STATES; i++) {
+		if (aviable_devices[index].states[i] && strcmp(aviable_devices[index].states[i], state) == 0)
+			return true;
+	}
+	return false;
 }
 
 
@@ -41,13 +87,6 @@ int get_index_device(char *name) {
 		}
 	}
 	return -1;
-}
-
-
-bool check_device(char *name) {
-	if (get_index_device(name) != -1)
-		return true;
-	return false;
 }
 
 

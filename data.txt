@@ -1,4 +1,7 @@
-teapot off
-speaker off
-temperature off
+teapot on
+conditioner on
+speaker on
+doorbell on
+door on
+temperature on
 smoke on

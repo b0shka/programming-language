@@ -7,7 +7,7 @@
 }
 
 %union {
-	bool job_status;
+	char *action;
 	char *time;
 	char *name;
 	char *filename;
@@ -19,7 +19,7 @@
 %token<name> NAME
 %token<filename> FILENAME
 %token<time> TIME_VALUE
-%token<job_status> ACTION_JOB
+%token<action> ACTION
 
 %type COMMANDS COMMAND END
 %type<event> ACTIONS
@@ -32,37 +32,41 @@ COMMANDS:
 ;
 
 COMMAND:	PATH '=' QUOTE FILENAME QUOTE				{ G_PATH_FILE_DATA = $4; }
-|			ADD VAL										{ add_device(strdup($2)); }
+|			ADD VAL										{ 
+															if (get_index_aviable_device(strdup($2)) != -1)
+																add_device($2);
+															else
+																yyerror("Such a device is not supported");
+														}
 |			ACTIONS										{
-															if ($1->time != NULL)
-																add_event($1);
-															else {
-																if (strcmp($1->action, "on") == 0)
-																	turn_on_device($1->name);
+															if (check_action_on_aviable($1->name, $1->action)) {
+																if ($1->time != NULL)
+																	add_event($1);
+																else {
+																	if (strcmp($1->action, "on") == 0)
+																		turn_on_device($1->name);
 
-																else if (strcmp($1->action, "off") == 0)
-																	turn_off_device($1->name);
+																	else if (strcmp($1->action, "off") == 0)
+																		turn_off_device($1->name);
 
-																overwriting_data_file();
+																	overwriting_data_file();
+																}
 															}
+															else
+																yyerror("This action is not supported");
 														}
 |			END
 ;
 
 ACTIONS:	DEVICE VAL									{ 
-															if (check_device($2)) {
+															if (get_index_device(strdup($2)) != -1) {
 																$$->name = strdup($2);
 																$$->time = NULL;
 															}
 															else
 																yyerror("Device not found");
 														}
-|			ACTIONS ACTION_JOB							{ 
-															if ($2)
-																$$->action = "on";
-															else
-																$$->action = "off";
- 														}
+|			ACTIONS ACTION								{ $$->action = strdup($2); }
 |			ACTIONS TIME TIME_VALUE						{ $$->time = strdup($3); }
 ;
 
