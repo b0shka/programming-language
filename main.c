@@ -151,9 +151,9 @@ int get_index_event(char *name) {
 }
 
 
-void clean_file() {
+void clean_file(char *path) {
 	FILE *file;
-	if (!(file = fopen(G_PATH_FILE_OUTPUT, "w")))
+	if (!(file = fopen(path, "w")))
 		yyerror("Failed to write data to file");
 	fclose(file);
 }
@@ -170,7 +170,7 @@ void write_data_file(char *name, char *job_status) {
 
 
 void overwriting_data_file() {
-	clean_file();
+	clean_file(G_PATH_FILE_OUTPUT);
 
 	for (int i = 0; i <= COUNT_DEVICES; i++) {
 		//if (devices[i].job_status)
@@ -255,6 +255,27 @@ void configure_devices() {
 }
 
 
+void update_configure() {
+	clean_file(G_PATH_FILE_INPUT);
+
+	FILE *file;
+	if (!(file = fopen(G_PATH_FILE_INPUT, "a")))
+		yyerror("Failed to write data to file");
+
+	char *status;
+
+	for (int i = 0; i < COUNT_DEVICES; i++) {
+		if (devices[i].state)
+			status = "true";
+		else
+			status = "false";
+		fprintf(file, "%s %s\n", devices[i].name, status);
+	}
+
+	fclose(file);
+}
+
+
 void logger(char *type, char *action, char *name) {
 	FILE *file;
 
@@ -333,8 +354,11 @@ void monitoring_condition() {
 		if (index == -1)
 			yyerror("Failed get index device");
 
-		if (devices[index].state)
+		if (devices[index].state) {
 			processing_actions(conditions[i].event);
+			devices[index].state = false;
+			update_configure();
+		}
 	}
 }
 
@@ -363,7 +387,7 @@ int main(int argc, char **argv) {
 	yyin = sourceFile;
 
 	configure_devices();
-	clean_file();
+	clean_file(G_PATH_FILE_OUTPUT);
 	yyparse();
 
 	free(events);
