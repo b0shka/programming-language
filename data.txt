@@ -1,8 +1,0 @@
-teapot off
-conditioner on
-speaker on
-doorbell on
-door on
-temperature on
-smoke on
-vacuum_cleaner off

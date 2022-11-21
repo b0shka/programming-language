@@ -3,31 +3,25 @@
 
 
 #define COUNT_DEVICES 8
-#define COUNT_ACTIONS 4
+#define COUNT_ACTIONS 3
 #define COUNT_STATES 1
 
-int q_count_devices = -1;
-int m_count_devices = 0;
 int q_count_events = -1;
 int m_count_events = 0;
-int q_count_settings = -1;
-int m_count_settings = 0;
 int q_count_conditions = -1;
 int m_count_conditions = 0;
 
-struct Device *devices = NULL;
 struct Event *events = NULL;
-struct Settings *settings_devices = NULL;
 struct Condition *conditions = NULL;
-struct AviableDevice aviable_devices[] = {
-	"teapot", {"boil"}, {},
-	"conditioner", {"on", "off", "target"}, {},
-	"doorbell", {"on", "off"}, {"call"},
-	"door", {"on", "off", "open", "close"}, {},
-	"temperature", {"on", "off"}, {"get_value"},
-	"smoke", {"on", "off"}, {"alarm"},
-	"speaker", {"on", "off", "sos"}, {},
-	"vacuum_cleaner", {"vacuum"}, {},
+struct Device devices[] = {
+	"teapot", {"boil"}, {}, false,
+	"conditioner", {"on", "off", "target"}, {}, false,
+	"doorbell", {}, {"call"}, false,
+	"door", {"open"}, {}, false,
+	"temperature", {}, {"get_value"}, false,
+	"smoke", {}, {"alarm"}, false,
+	"speaker", {"sos"}, {}, false,
+	"vacuum_cleaner", {"vacuum"}, {}, false,
 };
 
 
@@ -38,99 +32,30 @@ void yyerror(char *s) {
 
 
 void processing_actions(struct Event *event) {
-	if (check_action_on_aviable(event->name, event->action)) {
-		if (event->time != NULL)
-			add_event(event);
-		else {
-			if (strcmp(event->action, "on") == 0)
-				turn_on_device(event->name);
+	if (strcmp(event->action, "on") == 0)
+		turn_on_device(event->name);
 
-			else if (strcmp(event->action, "off") == 0)
-				turn_off_device(event->name);
+	else if (strcmp(event->action, "off") == 0)
+		turn_off_device(event->name);
 
-			else if (strcmp(event->action, "boil") == 0)
-				boil();
+	else if (strcmp(event->action, "boil") == 0)
+		boil();
 
-			else if (strcmp(event->action, "open") == 0)
-				open_door();
+	else if (strcmp(event->action, "open") == 0)
+		open_door();
 
-			else if (strcmp(event->action, "close") == 0)
-				close_door();
+	else if (strcmp(event->action, "vacuum") == 0)
+		vacuum();
 
-			else if (strcmp(event->action, "vacuum") == 0)
-				vacuum();
+	else if (strcmp(event->action, "target") == 0)
+		change_temperature(event->target);
 
-			else if (strcmp(event->action, "target") == 0)
-				change_temperature(event->target);
-
-			overwriting_data_file();
-		}
-	}
-	else
-		yyerror("This action is not supported");
-}
-
-
-int get_index_aviable_device(char *name) {
-	for (int i = 0; i < COUNT_DEVICES; i++) {
-		if (strcmp(aviable_devices[i].name, name) == 0) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-
-bool check_action_on_aviable(char *name, char *action) {
-	int index = get_index_aviable_device(name);
-
-	for (int i = 0; i < COUNT_ACTIONS; i++) {
-		if (aviable_devices[index].actions[i] && strcmp(aviable_devices[index].actions[i], action) == 0)
-			return true;
-	}
-	return false;
-}
-
-
-bool check_state_on_aviable(char *name, char *state) {
-	int index = get_index_aviable_device(name);
-
-	for (int i = 0; i < COUNT_STATES; i++) {
-		if (aviable_devices[index].states[i] && strcmp(aviable_devices[index].states[i], state) == 0)
-			return true;
-	}
-	return false;
-}
-
-
-void add_device(char *name) {
-	if (get_index_aviable_device(name) != -1) {
-		q_count_devices++;
-
-		struct Device device = {strdup(name), false};
-		if (q_count_devices >= m_count_devices) {
-			if (m_count_devices == 0)
-				m_count_devices++;
-			m_count_devices *= 2;
-			devices = (struct Device*)realloc(devices, sizeof(struct Device) * m_count_devices);
-		}
-
-		int index = get_index_settings_device(name);
-		if (index != -1)
-			device.state = settings_devices[index].state;
-
-		devices[q_count_devices] = device;
-
-		write_data_file(device.name, "off");
-		logger("INFO", "added a new device", name);
-	}
-	else
-		yyerror("Such a device is not supported");
+	//overwriting_data_file();
 }
 
 
 int get_index_device(char *name) {
-	for (int i = 0; i <= q_count_devices; i++) {
+	for (int i = 0; i < COUNT_DEVICES; i++) {
 		if (strcmp(devices[i].name, name) == 0) {
 			return i;
 		}
@@ -139,18 +64,34 @@ int get_index_device(char *name) {
 }
 
 
+bool check_action_device(char *name, char *action) {
+	int index = get_index_device(name);
+
+	for (int i = 0; i < COUNT_ACTIONS; i++) {
+		if (devices[index].actions[i] && strcmp(devices[index].actions[i], action) == 0)
+			return true;
+	}
+	return false;
+}
+
+
+bool check_state_device(char *name, char *state) {
+	int index = get_index_device(name);
+
+	for (int i = 0; i < COUNT_STATES; i++) {
+		if (devices[index].states[i] && strcmp(devices[index].states[i], state) == 0)
+			return true;
+	}
+	return false;
+}
+
+
 void turn_on_device(char *name) {	
 	const int index = get_index_device(name);
 	if (index == -1) 
 		yyerror("Failed get index device");
 
-	if (devices[index].job_status)
-		printf("[%s] already on\n", name);
-	else {
-		devices[index].job_status = true;
-		printf("[%s] on\n", name);
-	}
-
+	printf("[%s] on\n", name);
 	logger("INFO", "turn on device", name);
 }
 
@@ -160,13 +101,7 @@ void turn_off_device(char *name) {
 	if (index == -1) 
 		yyerror("Failed get index device");
 
-	if (devices[index].job_status) {
-		devices[index].job_status = false;
-		printf("[%s] off\n", name);
-	}
-	else
-		printf("[%s] already off\n", name);
-
+	printf("[%s] off\n", name);
 	logger("INFO", "turn off device", name);
 }
 
@@ -183,11 +118,6 @@ void boil() {
 
 void open_door() {
 	printf("[door] open\n");
-}
-
-
-void close_door() {
-	printf("[door] close\n");
 }
 
 
@@ -209,25 +139,6 @@ void add_event(struct Event *event) {
 	events[q_count_events] = *event;
 
 	logger("INFO", "added a new event", event->name);
-}
-
-
-void remove_event(int indexToRemove) {
-	struct Event *temp = (struct Event*)malloc(sizeof(struct Event) * q_count_events);
-
-	if (indexToRemove != 0)
-		memcpy(temp, events, sizeof(struct Event) * indexToRemove);
-
-	if (indexToRemove != q_count_events)
-		memcpy(temp+indexToRemove, events+indexToRemove+1, sizeof(struct Event) * (q_count_events - indexToRemove));
-
-	q_count_events--;
-	free(events);
-
-	for (int i = 0; i <= q_count_events; i++) {
-		events[i] = temp[i];
-	}
-	free(temp);
 }
 
 
@@ -261,23 +172,23 @@ void write_data_file(char *name, char *job_status) {
 void overwriting_data_file() {
 	clean_file();
 
-	for (int i = 0; i <= q_count_devices; i++) {
-		if (devices[i].job_status)
-			write_data_file(devices[i].name, "on");
-		else
-			write_data_file(devices[i].name, "off");
+	for (int i = 0; i <= COUNT_DEVICES; i++) {
+		//if (devices[i].job_status)
+		//	write_data_file(devices[i].name, "on");
+		//else
+		//	write_data_file(devices[i].name, "off");
 	}
 }
 
 
-char *read_configure_file() {
+char* read_file(char *path) {
 	char symbol;
 	char *data = NULL;
 	int q_count_chars = 0;
 	int m_count_chars = 0;
 
 	FILE *file;
-	if (!(file = fopen(G_PATH_FILE_INPUT, "r")))
+	if (!(file = fopen(path, "r")))
 		printf("Не удалось открыть файл\n");
 
 	do {
@@ -299,7 +210,7 @@ char *read_configure_file() {
 
 
 void configure_devices() {
-	char *data = read_configure_file();
+	char *data = read_file(G_PATH_FILE_INPUT);
 	char *data_device = NULL;
 	char *data_detail_device = NULL;
 	char *end_device, *name;
@@ -327,43 +238,20 @@ void configure_devices() {
 				mode_detail = 1;
 			}
 			else if (mode_detail == 1) {
-				if (get_index_aviable_device(name) != -1) {
+				if (get_index_device(name) != -1) {
 					if (strcmp(data_detail_device, "true") == 0)
 						state = true;
 					else
 						state = false;
-					struct Settings device = {strdup(name), state};
-					add_settings(&device);
+
+					int index = get_index_device(strdup(name));
+					if (index != -1)
+						devices[index].state = state;
 				}
 				mode_detail = 0;
 			}
 		}
 	}
-}
-
-
-void add_settings(struct Settings *device) {
-	q_count_settings++;
-
-	if (q_count_settings >= m_count_settings) {
-		if (m_count_settings == 0)
-			m_count_settings++;
-		m_count_settings *= 2;
-		settings_devices = (struct Settings*)realloc(settings_devices, sizeof(struct Settings) * m_count_settings);
-	}
-	settings_devices[q_count_settings] = *device;
-
-	logger("INFO", "added a new settings", device->name);
-}
-
-
-int get_index_settings_device(char *name) {
-	for (int i = 0; i <= q_count_settings; i++) {
-		if (strcmp(settings_devices[i].name, name) == 0) {
-			return i;
-		}
-	}
-	return -1;
 }
 
 
@@ -419,43 +307,44 @@ void add_condition(char *name, struct Event *event) {
 		m_count_conditions *= 2;
 		conditions = (struct Condition*)realloc(conditions, sizeof(struct Condition) * m_count_conditions);
 	}
-	conditions[q_count_conditions] = condition;
 
+	conditions[q_count_conditions] = condition;
 	logger("INFO", "added a new condition", name);
 }
 
 
 void monitoring_events() {
+	//char *time_ = get_time("%H:%M");
+	char *time_ = read_file("time.txt");
+	time_[5] = '\0';
+
 	for (int i = 0; i <= q_count_events; i++) {
-		char *time_ = get_time("%H:%M");
-
-		if (strcmp(time_, events[i].time) == 0) {
-			if (strcmp(events[i].action, "on") == 0)
-				turn_on_device(events[i].name);
-
-			else if (strcmp(events[i].action, "off") == 0)
-				turn_off_device(events[i].name);
-
-			const int index = get_index_event(events[i].name);
-			if (index == -1) 
-				yyerror("Failed get index event");
-			remove_event(index);
-			overwriting_data_file();
-			break;
-		}
+		if (strcmp(time_, events[i].time) == 0)
+			processing_actions(&events[i]);
 	}
 }
 
 
-void monitoring_settings() {
+void monitoring_condition() {
+	int index;
 
+	for (int i = 0; i <= q_count_conditions; i++) {
+		index = get_index_device(conditions[i].name);
+		if (index == -1)
+			yyerror("Failed get index device");
+
+		if (devices[index].state)
+			processing_actions(conditions[i].event);
+	}
 }
 
 
 void monitoring() {
 	while (true) {
-		if (q_count_events != -1)
-			monitoring_events();
+		monitoring_events();
+		configure_devices();
+		monitoring_condition();
+		sleep(3);
 	}
 }
 
@@ -477,6 +366,8 @@ int main(int argc, char **argv) {
 	clean_file();
 	yyparse();
 
-	free(devices);
+	free(events);
+	free(conditions);
+
 	return 1;
 }

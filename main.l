@@ -12,12 +12,11 @@ filename		[.+]?[.+]?[\/]?[a-zA-Z_][a-zA-Z0-9_\/.-]+
 name			[a-zA-Z_][a-zA-Z0-9_]*
 comment_str		\/\/.*
 comment_strs	\/\*(.*\n)*.*\*\/
-actions			on|off|open|close|call|target|get_value|alarm|vacuum|boil
+actions			on|off|open|target|vacuum|boil
 
 %%
 
 FILE_OUTPUT						{ return PATH; }
-add_device						{ return ADD; }
 device|DEVICE					{ return DEVICE; }
 time|TIME						{ return TIME; }
 if								{ return IF; }

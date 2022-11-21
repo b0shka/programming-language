@@ -35,8 +35,16 @@ COMMANDS:
 ;
 
 COMMAND:	PATH '=' QUOTE FILENAME QUOTE				{ G_PATH_FILE_OUTPUT = $4; }
-|			ADD VAL										{ add_device($2); }
-|			ACTIONS										{ processing_actions($1); }
+|			ACTIONS										{ 
+															if (check_action_device($1->name, $1->action)) {
+																if ($1->time != NULL)
+																	add_event($1);
+																else 
+																	processing_actions($1);
+															}
+															else
+																yyerror("This action is not supported");
+														}
 |			END											{ monitoring(); }
 ;
 
