@@ -1,8 +1,7 @@
 #include "main.h"
 #include "parser.h"
 
-
-#define COUNT_DEVICES 8
+#define COUNT_DEVICES 7
 #define COUNT_ACTIONS 3
 #define COUNT_STATES 1
 
@@ -18,7 +17,6 @@ struct Device devices[] = {
 	"conditioner", {"on", "off", "target"}, {}, false,
 	"doorbell", {}, {"call"}, false,
 	"door", {"open"}, {}, false,
-	"temperature", {}, {"get_value"}, false,
 	"smoke", {}, {"alarm"}, false,
 	"speaker", {"sos"}, {}, false,
 	"vacuum_cleaner", {"vacuum"}, {}, false,
@@ -50,7 +48,10 @@ void processing_actions(struct Event *event) {
 	else if (strcmp(event->action, "target") == 0)
 		change_temperature(event->target);
 
-	//overwriting_data_file();
+	if (event->time != NULL)
+		write_data_file(event->name, event->action, event->time);
+	else
+		write_data_file(event->name, event->action, get_time("%H:%M"));
 }
 
 
@@ -112,7 +113,7 @@ void change_temperature(int temperature) {
 
 
 void boil() {
-	printf("[teapot] start boil\n");
+	printf("[teapot] boil\n");
 }
 
 
@@ -136,8 +137,8 @@ void add_event(struct Event *event) {
 		m_count_events *= 2;
 		events = (struct Event*)realloc(events, sizeof(struct Event) * m_count_events);
 	}
-	events[q_count_events] = *event;
 
+	events[q_count_events] = *event;
 	logger("INFO", "added a new event", event->name);
 }
 
@@ -159,25 +160,13 @@ void clean_file(char *path) {
 }
 
 
-void write_data_file(char *name, char *job_status) {
+void write_data_file(char *name, char *action, char *time) {
 	FILE *file;
 	if (!(file = fopen(G_PATH_FILE_OUTPUT, "a")))
 		yyerror("Failed to write data to file");
 
-	fprintf(file, "%s %s\n", name, job_status);
+	fprintf(file, "[%s] %s %s\n", time, name, action);
 	fclose(file);
-}
-
-
-void overwriting_data_file() {
-	clean_file(G_PATH_FILE_OUTPUT);
-
-	for (int i = 0; i <= COUNT_DEVICES; i++) {
-		//if (devices[i].job_status)
-		//	write_data_file(devices[i].name, "on");
-		//else
-		//	write_data_file(devices[i].name, "off");
-	}
 }
 
 
@@ -265,11 +254,13 @@ void update_configure() {
 	char *status;
 
 	for (int i = 0; i < COUNT_DEVICES; i++) {
-		if (devices[i].state)
-			status = "true";
-		else
-			status = "false";
-		fprintf(file, "%s %s\n", devices[i].name, status);
+		if (devices[i].states[0]) {
+			if (devices[i].state)
+				status = "true";
+			else
+				status = "false";
+			fprintf(file, "%s %s\n", devices[i].name, status);
+		}
 	}
 
 	fclose(file);
@@ -337,11 +328,19 @@ void add_condition(char *name, struct Event *event) {
 void monitoring_events() {
 	//char *time_ = get_time("%H:%M");
 	char *time_ = read_file("time.txt");
-	time_[5] = '\0';
+
+	if (time_[4] == '\n')
+		time_[4] = '\0';
+	else
+		time_[5] = '\0';
 
 	for (int i = 0; i <= q_count_events; i++) {
-		if (strcmp(time_, events[i].time) == 0)
+		if (strcmp(time_, events[i].time) == 0 && !events[i].status_complete) {
 			processing_actions(&events[i]);
+			events[i].status_complete = true;
+		}
+		else if (strcmp(time_, events[i].time) != 0 && events[i].status_complete)
+			events[i].status_complete = false;
 	}
 }
 

@@ -27,6 +27,7 @@ struct Event {
 	char *action;
 	char *time;
 	int target;
+	bool status_complete;
 };
 
 struct Condition {
@@ -53,8 +54,7 @@ void add_event(struct Event *event);
 int get_index_action(char *name);
 
 void clean_file(char *path);
-void write_data_file(char *name, char *job_status);
-void overwriting_data_file(); //
+void write_data_file(char *name, char *action, char *time);
 
 char *read_file(char *path);
 void configure_devices();

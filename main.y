@@ -34,7 +34,7 @@ COMMANDS:
 |			COMMANDS OP
 ;
 
-COMMAND:	PATH '=' QUOTE FILENAME QUOTE				{ G_PATH_FILE_OUTPUT = $4; }
+COMMAND:	PATH '=' QUOTE FILENAME QUOTE				{ G_PATH_FILE_OUTPUT = strdup($4); }
 |			ACTIONS										{ 
 															if (check_action_device($1->name, $1->action)) {
 																if ($1->time != NULL)
@@ -59,6 +59,7 @@ ACTIONS:	DEVICE VAL									{
 															if (get_index_device($2) != -1) {
 																$$->name = $2;
 																$$->time = NULL;
+																$$->status_complete = false;
 															}
 															else
 																yyerror("Device not found");

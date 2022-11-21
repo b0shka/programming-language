@@ -1,8 +1,2 @@
-teapot false
-conditioner false
 doorbell false
-door false
-temperature false
 smoke false
-speaker false
-vacuum_cleaner false
