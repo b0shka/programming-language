@@ -13,29 +13,31 @@
 	char *filename;
 	int num;
 	struct Event *event;
+	struct Event *events;
 }
 
 %token PATH ADD DEVICE END
-%token TIME QUOTE IF ELSE ARROW
+%token TIME QUOTE IF ELSE
 %token<name> NAME
 %token<filename> FILENAME
 %token<time> TIME_VALUE
 %token<num> NUMBER
-%token<action> ACTION
+%token<action> ACTION_VALUE
 
-%type COMMANDS COMMAND OP
-%type<event> ACTIONS
+%type COMMANDS COMMAND
+%type<events> OPS OP
+%type<event> ACTION
 %type<name> VAL
 
 %%
 
 COMMANDS:
 |			COMMANDS COMMAND
-|			COMMANDS OP
+|			COMMANDS OPS
 ;
 
 COMMAND:	PATH '=' QUOTE FILENAME QUOTE				{ G_PATH_FILE_OUTPUT = strdup($4); }
-|			ACTIONS										{ 
+|			ACTION										{ 
 															if (check_action_device($1->name, $1->action)) {
 																if ($1->time != NULL)
 																	add_event($1);
@@ -48,14 +50,23 @@ COMMAND:	PATH '=' QUOTE FILENAME QUOTE				{ G_PATH_FILE_OUTPUT = strdup($4); }
 |			END											{ monitoring(); }
 ;
 
-OP:			IF VAL ARROW ACTIONS						{ 
+/*OP:			IF VAL '{' ACTION '}'						{ 
+															printf("%s %s\n", $4->name, $4->action);
 															add_condition($2, $4);
 															if (checking_condition($2))
 																processing_actions($4);
  														}
+;*/
+
+
+OPS:		IF VAL '{' OP '}'							{ add_condition($2); }
 ;
 
-ACTIONS:	DEVICE VAL									{ 
+OP:			ACTION										{ add_event_condition($1); /*printf("%s %s\n", $1->name, $1->action);*/ }
+|			OP ACTION									{ add_event_condition($2); /*printf("%s %s\n", $2->name, $2->action);*/ }
+;
+
+ACTION:		DEVICE VAL									{ 
 															if (get_index_device($2) != -1) {
 																$$->name = $2;
 																$$->time = NULL;
@@ -64,9 +75,9 @@ ACTIONS:	DEVICE VAL									{
 															else
 																yyerror("Device not found");
 														}
-|			ACTIONS ACTION								{ $$->action = strdup($2); }
-//|			ACTIONS NUMBER								{ $$->target = $2; }
-|			ACTIONS TIME TIME_VALUE						{ $$->time = strdup($3); }
+|			ACTION ACTION_VALUE							{ $$->action = strdup($2); }
+//|			ACTION NUMBER								{ $$->target = $2; }
+|			ACTION TIME TIME_VALUE						{ $$->time = strdup($3); }
 ;
 
 VAL:		'(' QUOTE NAME QUOTE ')'					{ $$ = strdup($3); }

@@ -32,7 +32,8 @@ struct Event {
 
 struct Condition {
 	char *name;
-	struct Event *event;
+	struct Event *events;
+	int count_events;
 };
 
 
@@ -64,7 +65,8 @@ void logger(char *type, char *action, char *name);
 char* get_time(char *format);
 
 bool checking_condition(char *name);
-void add_condition(char *name, struct Event *event);
+void add_condition(char *name);
+void add_event_condition( struct Event *event);
 
 void monitoring_events();
 void monitoring_condition();

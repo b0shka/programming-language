@@ -1,10 +1,7 @@
-[7:00] teapot boil
-[12:00] conditioner on
-[12:00] vacuum_cleaner vacuum
-[12:15] conditioner off
-[15:00] conditioner on
-[15:15] conditioner off
-[18:00] conditioner on
-[18:00] vacuum_cleaner vacuum
-[18:15] conditioner off
-[20:44] door open
+[19:35] door open
+[19:35] vacuum_cleaner vacuum
+[19:35] teapot boil
+[19:35] door open
+[19:35] door open
+[19:35] vacuum_cleaner vacuum
+[19:35] teapot boil

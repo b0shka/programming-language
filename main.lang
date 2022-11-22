@@ -13,4 +13,12 @@ device "teapot" boil time 7:00
 device "vacuum_cleaner" vacuum time 12:00
 device "vacuum_cleaner" vacuum time 18:00
 
-if "doorbell" -> device "door" open
+if "doorbell" {
+	device "door" open
+	device "vacuum_cleaner" vacuum
+	device "teapot" boil
+}
+
+if "smoke" {
+	device "door" open
+}

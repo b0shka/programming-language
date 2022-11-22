@@ -9,8 +9,11 @@ int q_count_events = -1;
 int m_count_events = 0;
 int q_count_conditions = -1;
 int m_count_conditions = 0;
+int q_count_condition_events = -1;
+int m_count_condition_events = 0;
 
 struct Event *events = NULL;
+struct Event *condition_events = NULL;
 struct Condition *conditions = NULL;
 struct Device devices[] = {
 	"teapot", {"boil"}, {}, false,
@@ -129,7 +132,6 @@ void vacuum() {
 
 void add_event(struct Event *event) {
 	q_count_events++;
-	printf("[%s] added a new event for %s\n", event->name, event->time);
 
 	if (q_count_events >= m_count_events) {
 		if (m_count_events == 0)
@@ -139,6 +141,7 @@ void add_event(struct Event *event) {
 	}
 
 	events[q_count_events] = *event;
+	printf("[%s] added a new event for %s\n", event->name, event->time);
 	logger("INFO", "added a new event", event->name);
 }
 
@@ -309,9 +312,9 @@ bool checking_condition(char *name) {
 }
 
 
-void add_condition(char *name, struct Event *event) {
+void add_condition(char *name) {
 	q_count_conditions++;
-	struct Condition condition = {strdup(name), event};
+	struct Condition condition = {strdup(name), condition_events, q_count_condition_events+1};
 
 	if (q_count_conditions >= m_count_conditions) {
 		if (m_count_conditions == 0)
@@ -321,7 +324,27 @@ void add_condition(char *name, struct Event *event) {
 	}
 
 	conditions[q_count_conditions] = condition;
+	printf("[%s] added a new condition\n", name);
 	logger("INFO", "added a new condition", name);
+
+	condition_events = NULL;
+	q_count_condition_events = -1;
+	m_count_condition_events = 0;
+}
+
+
+void add_event_condition(struct Event *event) {
+	q_count_condition_events++;
+
+	if (q_count_condition_events >= m_count_condition_events) {
+		if (m_count_condition_events == 0)
+			m_count_condition_events++;
+		m_count_condition_events *= 2;
+		condition_events = (struct Event*)realloc(condition_events, sizeof(struct Event) * m_count_condition_events);
+	}
+
+	condition_events[q_count_condition_events] = *event;
+	logger("INFO", "added a new event to condition", event->name);
 }
 
 
@@ -354,7 +377,10 @@ void monitoring_condition() {
 			yyerror("Failed get index device");
 
 		if (devices[index].state) {
-			processing_actions(conditions[i].event);
+			for (int j = 0; j < conditions[i].count_events; j++) {
+				processing_actions(&conditions[i].events[j]);
+			}
+
 			devices[index].state = false;
 			update_configure();
 		}
@@ -391,6 +417,7 @@ int main(int argc, char **argv) {
 
 	free(events);
 	free(conditions);
+	free(condition_events);
 
 	return 1;
 }
