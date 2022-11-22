@@ -301,14 +301,18 @@ char* get_time(char *format) {
 
 
 bool checking_condition(char *name) {
-	int index = get_index_device(name);
-	if (index != -1) {
-		if (devices[index].state)
-			return true;
-		return false;
-	}
-	else
+	int index_device = get_index_device(name);
+	if (index_device == -1)
 		yyerror("Failed get index device");
+
+	if (devices[index_device].state) {
+		int index_condition = get_index_condition(name);
+		for (int i = 0; i < conditions[index_condition].count_events; i++)
+			processing_actions(&conditions[index_condition].events[i]);
+
+		devices[index_device].state = false;
+		update_configure();
+	}
 }
 
 
@@ -348,6 +352,16 @@ void add_event_condition(struct Event *event) {
 }
 
 
+int get_index_condition(char *name) {
+	for (int i = 0; i <= q_count_conditions; i++) {
+		if (strcmp(conditions[i].name, name) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+
 void monitoring_events() {
 	//char *time_ = get_time("%H:%M");
 	char *time_ = read_file("time.txt");
@@ -377,9 +391,8 @@ void monitoring_condition() {
 			yyerror("Failed get index device");
 
 		if (devices[index].state) {
-			for (int j = 0; j < conditions[i].count_events; j++) {
+			for (int j = 0; j < conditions[i].count_events; j++)
 				processing_actions(&conditions[i].events[j]);
-			}
 
 			devices[index].state = false;
 			update_configure();

@@ -50,20 +50,14 @@ COMMAND:	PATH '=' QUOTE FILENAME QUOTE				{ G_PATH_FILE_OUTPUT = strdup($4); }
 |			END											{ monitoring(); }
 ;
 
-/*OP:			IF VAL '{' ACTION '}'						{ 
-															printf("%s %s\n", $4->name, $4->action);
-															add_condition($2, $4);
-															if (checking_condition($2))
-																processing_actions($4);
- 														}
-;*/
-
-
-OPS:		IF VAL '{' OP '}'							{ add_condition($2); }
+OPS:		IF VAL '{' OP '}'							{ 
+															add_condition($2); 
+															checking_condition($2);
+														}
 ;
 
-OP:			ACTION										{ add_event_condition($1); /*printf("%s %s\n", $1->name, $1->action);*/ }
-|			OP ACTION									{ add_event_condition($2); /*printf("%s %s\n", $2->name, $2->action);*/ }
+OP:			ACTION										{ add_event_condition($1); }
+|			OP ACTION									{ add_event_condition($2); }
 ;
 
 ACTION:		DEVICE VAL									{ 

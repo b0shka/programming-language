@@ -67,6 +67,7 @@ char* get_time(char *format);
 bool checking_condition(char *name);
 void add_condition(char *name);
 void add_event_condition( struct Event *event);
+int get_index_condition(char *name);
 
 void monitoring_events();
 void monitoring_condition();
