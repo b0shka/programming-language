@@ -1,7 +1,7 @@
 #include "main.h"
 #include "parser.h"
 
-#define COUNT_DEVICES 7
+#define COUNT_DEVICES 8
 #define COUNT_ACTIONS 3
 #define COUNT_STATES 1
 
@@ -21,7 +21,8 @@ struct Device devices[] = {
 	"doorbell", {}, {"call"}, false,
 	"door", {"open"}, {}, false,
 	"smoke", {}, {"alarm"}, false,
-	"speaker", {"sos"}, {}, false,
+	"water_leak", {}, {"leak"}, false,
+	"speaker", {"sos", "host_notification"}, {}, false,
 	"vacuum_cleaner", {"vacuum"}, {}, false,
 };
 
@@ -50,6 +51,12 @@ void processing_actions(struct Event *event) {
 
 	else if (strcmp(event->action, "target") == 0)
 		change_temperature(event->target);
+
+	else if (strcmp(event->action, "sos") == 0)
+		sos();
+
+	else if (strcmp(event->action, "host_notification") == 0)
+		host_notification(event->notification);
 
 	if (event->time != NULL)
 		write_data_file(event->name, event->action, event->time);
@@ -127,6 +134,16 @@ void open_door() {
 
 void vacuum() {
 	printf("[vacuum_cleaner] vacuum\n");
+}
+
+
+void sos() {
+	printf("[speaker] rescue service called\n");
+}
+
+
+void host_notification(char *notification) {
+	printf("[speaker] you have an urgent notification: %s\n", notification);
 }
 
 

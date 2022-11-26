@@ -23,4 +23,9 @@ if "doorbell" {
 
 if "smoke" {
 	device "door" open
+	device "speaker" sos
+}
+
+if "water_leak" {
+	device "speaker" host_notification "water_leakage"
 }

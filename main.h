@@ -26,6 +26,7 @@ struct Event {
 	char *action;
 	char *time;
 	char *target;
+	char *notification;
 	bool status_complete;
 };
 
@@ -49,6 +50,8 @@ void change_temperature(char *temp);
 void boil();
 void open_door();
 void vacuum();
+void sos();
+void host_notification(char *notification);
 
 void add_event(struct Event *event);
 int get_index_action(char *name);

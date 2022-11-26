@@ -12,7 +12,7 @@ path			[.+]?[.+]?[\/]?[a-zA-Z_][a-zA-Z0-9_\/.-]+
 name			[a-zA-Z_][a-zA-Z0-9_]*
 comment_str		\/\/.*
 comment_strs	\/\*(.*\n)*.*\*\/
-actions			on|off|open|vacuum|boil|target
+actions			on|off|open|vacuum|boil|target|sos|host_notification
 
 %%
 

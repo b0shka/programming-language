@@ -57,6 +57,7 @@ OP:			CONDITION									{ add_event_condition($1); }
 
 CONDITION:	ACTION										{ $$ = $1; }
 |			ACTION NUMBER								{ $$->target = $2; }
+|			ACTION VAL									{ $$->notification = $2; }
 |			CONDITION TIME TIME_VALUE					{ $$->time = $3; }
 ;
 
