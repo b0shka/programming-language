@@ -110,8 +110,8 @@ void turn_off_device(char *name) {
 }
 
 
-void change_temperature(int temperature) {
-	printf("[conditioner] temperature change by value: %d\n", temperature);
+void change_temperature(char *temperature) {
+	printf("[conditioner] temperature change by value: %s\n", temperature);
 }
 
 

@@ -18,7 +18,6 @@ struct Device {
 	char *name;
 	char *actions[3];
 	char *states[1];
-	//bool job_status;
 	bool state;
 };
 
@@ -26,7 +25,7 @@ struct Event {
 	char *name;
 	char *action;
 	char *time;
-	int target;
+	char *target;
 	bool status_complete;
 };
 
@@ -46,7 +45,7 @@ bool check_state_device(char *name, char *state);
 
 void turn_on_device(char *name);
 void turn_off_device(char *name);
-void change_temperature(int temp);
+void change_temperature(char *temp);
 void boil();
 void open_door();
 void vacuum();

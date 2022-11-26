@@ -1,7 +1,1 @@
-[19:56] door open
-[19:56] vacuum_cleaner vacuum
-[19:56] teapot boil
-[19:56] door open
-[19:56] vacuum_cleaner vacuum
-[19:56] teapot boil
-[19:56] door open
+[00:06] conditioner target

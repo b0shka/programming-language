@@ -8,25 +8,24 @@ void yyerror(char *s);
 
 number			[0-9]+
 time			([0-1]?[0-9]|2[0-3]):[0-5][0-9]
-filename		[.+]?[.+]?[\/]?[a-zA-Z_][a-zA-Z0-9_\/.-]+
+path			[.+]?[.+]?[\/]?[a-zA-Z_][a-zA-Z0-9_\/.-]+
 name			[a-zA-Z_][a-zA-Z0-9_]*
 comment_str		\/\/.*
 comment_strs	\/\*(.*\n)*.*\*\/
-actions			on|off|open|target|vacuum|boil
+actions			on|off|open|vacuum|boil|target
 
 %%
 
-FILE_OUTPUT						{ return PATH; }
+FILE_OUTPUT						{ return FILE_OUTPUT; }
 device|DEVICE					{ return DEVICE; }
 time|TIME						{ return TIME; }
 if								{ return IF; }
-else							{ return ELSE; }
 
 {actions}						{ yylval.action = strdup(yytext); return ACTION_VALUE; }
 {time}							{ yylval.time = strdup(yytext); return TIME_VALUE; }
-{number}						{ yylval.num = atoi(yytext); return NUMBER; }
+{number}						{ yylval.num = strdup(yytext); return NUMBER; }
 {name}							{ yylval.name = strdup(yytext); return NAME; }
-{filename}						{ yylval.filename = strdup(yytext); return FILENAME; }
+{path}							{ yylval.path = strdup(yytext); return PATH; }
 
 \"								{ return QUOTE; }
 

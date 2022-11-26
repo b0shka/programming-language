@@ -1,6 +1,8 @@
 FILE_OUTPUT = "data.txt"
 
-//device "conditioner" target 24
+device "conditioner" target 21 time 12:00
+device "conditioner" target 19 time 15:00
+device "conditioner" target 23 time 18:00
 device "conditioner" on time 12:00
 device "conditioner" on time 15:00
 device "conditioner" on time 18:00
