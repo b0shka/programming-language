@@ -32,8 +32,16 @@ struct Event {
 
 struct Condition {
 	char *name;
+	//char *time_start;
+	//char *time_end;
 	struct Event *events;
 	int count_events;
+};
+
+struct Expression {
+	char *name;
+	char *time_start;
+	char *time_end;
 };
 
 
@@ -66,8 +74,8 @@ void update_configure();
 void logger(char *type, char *action, char *name);
 char* get_time(char *format);
 
-bool checking_condition(char *name);
-void add_condition(char *name);
+void checking_condition(char *name);
+void add_condition(struct Expression *expression);
 void add_event_condition( struct Event *event);
 int get_index_condition(char *name);
 

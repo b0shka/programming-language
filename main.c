@@ -1,7 +1,7 @@
 #include "main.h"
 #include "parser.h"
 
-#define COUNT_DEVICES 8
+#define COUNT_DEVICES 10
 #define COUNT_ACTIONS 3
 #define COUNT_STATES 1
 
@@ -24,6 +24,8 @@ struct Device devices[] = {
 	"water_leak", {}, {"leak"}, false,
 	"speaker", {"sos", "host_notification"}, {}, false,
 	"vacuum_cleaner", {"vacuum"}, {}, false,
+	"movements", {}, {"movement"}, false,
+	"lamp", {"on", "off"}, {}, false
 };
 
 
@@ -317,7 +319,7 @@ char* get_time(char *format) {
 }
 
 
-bool checking_condition(char *name) {
+void checking_condition(char *name) {
 	int index_device = get_index_device(name);
 	if (index_device == -1)
 		yyerror("Failed get index device");
@@ -333,9 +335,15 @@ bool checking_condition(char *name) {
 }
 
 
-void add_condition(char *name) {
+void add_condition(struct Expression *expression) {
 	q_count_conditions++;
-	struct Condition condition = {strdup(name), condition_events, q_count_condition_events+1};
+	struct Condition condition = {
+		strdup(expression->name), 
+		//strdup(expression->time_start),
+		//strdup(expression->time_end),
+		condition_events, 
+		q_count_condition_events+1
+	};
 
 	if (q_count_conditions >= m_count_conditions) {
 		if (m_count_conditions == 0)
@@ -345,8 +353,8 @@ void add_condition(char *name) {
 	}
 
 	conditions[q_count_conditions] = condition;
-	printf("[%s] added a new condition\n", name);
-	logger("INFO", "added a new condition", name);
+	printf("[%s] added a new condition\n", expression->name);
+	logger("INFO", "added a new condition", expression->name);
 
 	condition_events = NULL;
 	q_count_condition_events = -1;

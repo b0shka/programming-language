@@ -20,6 +20,7 @@ FILE_OUTPUT						{ return FILE_OUTPUT; }
 device|DEVICE					{ return DEVICE; }
 time|TIME						{ return TIME; }
 if								{ return IF; }
+and								{ return AND; }
 
 {actions}						{ yylval.action = strdup(yytext); return ACTION_VALUE; }
 {time}							{ yylval.time = strdup(yytext); return TIME_VALUE; }
@@ -33,7 +34,7 @@ if								{ return IF; }
 {comment_strs}					{ ; }
 [ \t\n]							{ ; }
 
-[(){}=]							{ return *yytext; }
+[(){}=<>]						{ return *yytext; }
 <<EOF>>							{ return END; }
 .								{ yyerror("Invalid character"); }
 

@@ -29,3 +29,7 @@ if "smoke" {
 if "water_leak" {
 	device "speaker" host_notification "water_leakage"
 }
+
+if "movements" and time > 19:00 {
+	device "lamp" on
+}
