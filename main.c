@@ -335,15 +335,15 @@ void checking_condition(char *name) {
 }
 
 
-void add_condition(struct Expression *expression) {
+void add_condition(struct Arguments *arguments) {
 	q_count_conditions++;
-	struct Condition condition = {
-		strdup(expression->name), 
-		//strdup(expression->time_start),
-		//strdup(expression->time_end),
-		condition_events, 
-		q_count_condition_events+1
-	};
+
+	struct Condition *condition = (struct Condition*)malloc(sizeof(struct Condition));
+	condition->name = arguments->name;
+	condition->time_start = arguments->time_start;
+	condition->time_end = arguments->time_end;
+	condition->events = condition_events;
+	condition->count_events = q_count_condition_events+1;
 
 	if (q_count_conditions >= m_count_conditions) {
 		if (m_count_conditions == 0)
@@ -352,9 +352,9 @@ void add_condition(struct Expression *expression) {
 		conditions = (struct Condition*)realloc(conditions, sizeof(struct Condition) * m_count_conditions);
 	}
 
-	conditions[q_count_conditions] = condition;
-	printf("[%s] added a new condition\n", expression->name);
-	logger("INFO", "added a new condition", expression->name);
+	conditions[q_count_conditions] = *condition;
+	printf("[%s] added a new condition\n", arguments->name);
+	logger("INFO", "added a new condition", arguments->name);
 
 	condition_events = NULL;
 	q_count_condition_events = -1;
@@ -387,6 +387,130 @@ int get_index_condition(char *name) {
 }
 
 
+bool time_comparison(char *time_now, char *time_start, char *time_end) {
+	bool result = false;
+	int hours_time_now = get_hours_from_time(time_now);
+	int minutes_time_now = get_minutes_from_time(time_now);
+	int hours_time_start, hours_time_end, minutes_time_start, minutes_time_end;
+
+	if (time_start != NULL && time_end != NULL) {
+		hours_time_start = get_hours_from_time(time_start);
+		hours_time_end = get_hours_from_time(time_end);
+
+		if (hours_time_start > hours_time_end) {
+			if (hours_time_now > hours_time_start || hours_time_now < hours_time_end)
+				result = true;
+
+			else if (hours_time_now == hours_time_start) {
+				minutes_time_start = get_minutes_from_time(time_start);
+				if (minutes_time_now >= minutes_time_start)
+					result = true;
+			}
+
+			else if (hours_time_now == hours_time_end) {
+				minutes_time_end = get_minutes_from_time(time_end);
+				if (minutes_time_now <= minutes_time_end)
+					result = true;
+			}
+		}
+
+		else if (hours_time_start < hours_time_end) {
+			if (hours_time_now > hours_time_start && hours_time_now < hours_time_end)
+				result = true;
+
+			else if (hours_time_now == hours_time_start) {
+				minutes_time_start = get_minutes_from_time(time_start);
+				if (minutes_time_now >= minutes_time_start)
+					result = true;
+			}
+
+			else if (hours_time_now == hours_time_end) {
+				minutes_time_end = get_minutes_from_time(time_end);
+				if (minutes_time_now <= minutes_time_end)
+					result = true;
+			}
+		}
+
+		else {
+			if (hours_time_now == hours_time_end) {
+				minutes_time_start = get_minutes_from_time(time_start);
+				minutes_time_end = get_minutes_from_time(time_end);
+
+				if (minutes_time_now >= minutes_time_start && minutes_time_now <= minutes_time_end)
+					result = true;
+			}
+		}
+	}
+
+	else if (time_start != NULL) {
+		hours_time_start = get_hours_from_time(time_start);
+
+		if (hours_time_now > hours_time_start)
+			result = true;
+		else if (hours_time_now == hours_time_start) {
+			minutes_time_start = get_minutes_from_time(time_start);
+
+			if (minutes_time_now >= minutes_time_start)
+				result = true;
+		}
+	}
+
+	else if (time_end != NULL) {
+		hours_time_end = get_hours_from_time(time_end);
+
+		if (hours_time_now < hours_time_end)
+			result = true;
+		else if (hours_time_now == hours_time_end) {
+			minutes_time_end = get_minutes_from_time(time_end);
+
+			if (minutes_time_now <= minutes_time_end)
+				result = true;
+		}
+	}
+
+	else
+		result = true;
+	
+	return result;
+}
+
+
+int get_hours_from_time(char *origin_time) {
+	char result[2];
+
+	for (int i = 0; i < 3; i++) {
+		if (origin_time[i] != ':')
+			result[i] = origin_time[i];
+		else {
+			if (i == 1) {
+				result[1] = result[0];
+				result[0] = '0';
+			}
+			break;
+		}
+	}
+	return atoi(result);
+}
+
+
+int get_minutes_from_time(char *origin_time) {
+	char result[2];
+	bool mode = false;
+
+	for (int i = 0; i < 5; i++) {
+		if (mode) {
+			if (origin_time[2] == ':')
+				result[i-3] = origin_time[i];
+			else
+				result[i-2] = origin_time[i];
+		}
+		if (origin_time[i] == ':')
+			mode = true;
+	}
+	return atoi(result);
+}
+
+
 void monitoring_events() {
 	//char *time_ = get_time("%H:%M");
 	char *time_ = read_file("time.txt");
@@ -409,13 +533,17 @@ void monitoring_events() {
 
 void monitoring_condition() {
 	int index;
+	bool time_compare = true;
+	char *time_ = read_file("time.txt");
 
 	for (int i = 0; i <= q_count_conditions; i++) {
 		index = get_index_device(conditions[i].name);
 		if (index == -1)
 			yyerror("Failed get index device");
 
-		if (devices[index].state) {
+		time_compare = time_comparison(time_, conditions[i].time_start, conditions[i].time_end);
+
+		if (devices[index].state && time_compare) {
 			for (int j = 0; j < conditions[i].count_events; j++)
 				processing_actions(&conditions[i].events[j]);
 

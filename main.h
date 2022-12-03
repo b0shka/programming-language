@@ -32,13 +32,13 @@ struct Event {
 
 struct Condition {
 	char *name;
-	//char *time_start;
-	//char *time_end;
+	char *time_start;
+	char *time_end;
 	struct Event *events;
 	int count_events;
 };
 
-struct Expression {
+struct Arguments {
 	char *name;
 	char *time_start;
 	char *time_end;
@@ -75,9 +75,13 @@ void logger(char *type, char *action, char *name);
 char* get_time(char *format);
 
 void checking_condition(char *name);
-void add_condition(struct Expression *expression);
+void add_condition(struct Arguments *arguments);
 void add_event_condition( struct Event *event);
 int get_index_condition(char *name);
+
+bool time_comparison(char *time_now, char *time_start, char *time_end);
+int get_hours_from_time(char *origin_time);
+int get_minutes_from_time(char *origin_time);
 
 void monitoring_events();
 void monitoring_condition();

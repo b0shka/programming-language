@@ -4,6 +4,11 @@
 
 %code requires {
 	#include <stdbool.h>
+
+	struct Argument {
+		char *type;
+		char *value;
+	};
 }
 
 %union {
@@ -12,9 +17,9 @@
 	char *name;
 	char *path;
 	char *num;
-	struct Expression *expr;
+	struct Argument arg;
+	struct Arguments *args;
 	struct Event *event;
-	struct Event *events;
 }
 
 %token FILE_OUTPUT ADD DEVICE END TIME QUOTE IF AND
@@ -24,8 +29,9 @@
 %token<num> NUMBER
 %token<action> ACTION_VALUE
 
-%type COMMANDS COMMAND OP
-%type<expr> OPS
+%type COMMANDS COMMAND OP OPS
+%type<arg> ARG
+%type<args> ARGS
 %type<event> ACTION CONDITION
 %type<name> VAL
 
@@ -50,20 +56,65 @@ COMMAND:	FILE_OUTPUT '=' QUOTE PATH QUOTE	{ G_PATH_FILE_OUTPUT = strdup($4); }
 |			END									{ monitoring(); }
 ;
 
-OPS:		IF 									{}
-|			OPS VAL								{
-													struct Expression *expression = (struct Expression*)malloc(sizeof(struct Expression));
-													expression->name = $2;
-													$$ = expression;
+OPS:		IF ARGS '{' OP '}'					{
+													if ($2->name == NULL)
+														yyerror("Invalid condition");
+													add_condition($2); 
+													free($2);
 												}
-|			OPS AND								{}
-|			OPS TIME '>' TIME_VALUE				{ expression->time_start = $4; }
-|			OPS TIME '<' TIME_VALUE				{ expression->time_end = $4; }
-|			OPS '{' OP '}'						{ add_condition($$); }
 ;
 
 OP:			CONDITION							{ add_event_condition($1); }
 |			OP CONDITION						{ add_event_condition($2); }
+;
+
+ARGS:											{}
+|			ARG									{
+													$$ = (struct Arguments*)malloc(sizeof(struct Arguments)); 
+													$$->name = NULL;
+													$$->time_start = NULL;
+													$$->time_end = NULL;
+
+													if (strcmp($1.type, "name") == 0)
+														$$->name = strdup($1.value);
+													else if (strcmp($1.type, "time_start") == 0)
+														$$->time_start = strdup($1.value);
+													else if (strcmp($1.type, "time_end") == 0)
+														$$->time_end = strdup($1.value);
+												}
+|			ARGS AND ARG						{
+													if (strcmp($3.type, "name") == 0) {
+														$$->name = strdup($3.value);
+													}
+													else if (strcmp($3.type, "time_start") == 0) {
+														$$->time_start = strdup($3.value);
+													}
+													else if (strcmp($3.type, "time_end") == 0)
+														$$->time_end = strdup($3.value);
+												}
+;
+
+ARG:		VAL									{
+													struct Argument *argument = (struct Argument*)malloc(sizeof(struct Argument));
+													argument->type = "name";
+													argument->value = $1;
+													$$ = *argument;
+													free(argument);
+												}
+|			TIME '>' TIME_VALUE					{
+													struct Argument *argument = (struct Argument*)malloc(sizeof(struct Argument));
+													argument->type = "time_start";
+													argument->value = $3;
+													$$ = *argument;
+													free(argument);
+												}
+|			TIME '<' TIME_VALUE					{
+													struct Argument *argument = (struct Argument*)malloc(sizeof(struct Argument));
+													argument->type = "time_end";
+													argument->value = $3;
+													$$ = *argument;
+													free(argument);
+												}
 ;
 
 CONDITION:	ACTION								{ $$ = $1; }
