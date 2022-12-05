@@ -403,13 +403,13 @@ bool time_comparison(char *time_now, char *time_start, char *time_end) {
 
 			else if (hours_time_now == hours_time_start) {
 				minutes_time_start = get_minutes_from_time(time_start);
-				if (minutes_time_now >= minutes_time_start)
+				if (minutes_time_now > minutes_time_start)
 					result = true;
 			}
 
 			else if (hours_time_now == hours_time_end) {
 				minutes_time_end = get_minutes_from_time(time_end);
-				if (minutes_time_now <= minutes_time_end)
+				if (minutes_time_now < minutes_time_end)
 					result = true;
 			}
 		}
@@ -420,13 +420,13 @@ bool time_comparison(char *time_now, char *time_start, char *time_end) {
 
 			else if (hours_time_now == hours_time_start) {
 				minutes_time_start = get_minutes_from_time(time_start);
-				if (minutes_time_now >= minutes_time_start)
+				if (minutes_time_now > minutes_time_start)
 					result = true;
 			}
 
 			else if (hours_time_now == hours_time_end) {
 				minutes_time_end = get_minutes_from_time(time_end);
-				if (minutes_time_now <= minutes_time_end)
+				if (minutes_time_now < minutes_time_end)
 					result = true;
 			}
 		}
@@ -436,7 +436,7 @@ bool time_comparison(char *time_now, char *time_start, char *time_end) {
 				minutes_time_start = get_minutes_from_time(time_start);
 				minutes_time_end = get_minutes_from_time(time_end);
 
-				if (minutes_time_now >= minutes_time_start && minutes_time_now <= minutes_time_end)
+				if (minutes_time_now > minutes_time_start && minutes_time_now < minutes_time_end)
 					result = true;
 			}
 		}

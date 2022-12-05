@@ -58,8 +58,8 @@ COMMAND:	FILE_OUTPUT '=' QUOTE PATH QUOTE	{ G_PATH_FILE_OUTPUT = strdup($4); }
 
 OPS:		IF ARGS '{' OP '}'					{
 													if ($2->name == NULL)
-														yyerror("Invalid condition");
-													add_condition($2); 
+														yyerror("Incorrect condition argument");
+													add_condition($2);
 													free($2);
 												}
 ;
@@ -70,7 +70,7 @@ OP:			CONDITION							{ add_event_condition($1); }
 
 ARGS:											{}
 |			ARG									{
-													$$ = (struct Arguments*)malloc(sizeof(struct Arguments)); 
+													$$ = (struct Arguments*)malloc(sizeof(struct Arguments));
 													$$->name = NULL;
 													$$->time_start = NULL;
 													$$->time_end = NULL;
@@ -84,13 +84,20 @@ ARGS:											{}
 												}
 |			ARGS AND ARG						{
 													if (strcmp($3.type, "name") == 0) {
+														if ($$->name != NULL)
+															yyerror("Incorrect condition argument");
 														$$->name = strdup($3.value);
 													}
 													else if (strcmp($3.type, "time_start") == 0) {
+														if ($$->time_start != NULL)
+															yyerror("Incorrect condition argument");
 														$$->time_start = strdup($3.value);
 													}
-													else if (strcmp($3.type, "time_end") == 0)
+													else if (strcmp($3.type, "time_end") == 0) {
+														if ($$->time_end != NULL)
+															yyerror("Incorrect condition argument");
 														$$->time_end = strdup($3.value);
+													}
 												}
 ;
 

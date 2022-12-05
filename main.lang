@@ -32,4 +32,5 @@ if "water_leak" {
 
 if "movements" and time > 19:15 and time < 7:15 {
 	device "lamp" on
+	device "teapot" boil
 }
