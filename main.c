@@ -201,7 +201,7 @@ char* read_file(char *path) {
 
 
 void configure_devices() {
-	char *data = read_file(G_PATH_FILE_INPUT);
+	char *data = read_file(G_PATH_FILE_CONFIGURE);
 	char *data_device = NULL;
 	char *data_detail_device = NULL;
 	char *end_device, *name;
@@ -247,10 +247,10 @@ void configure_devices() {
 
 
 void update_configure() {
-	clean_file(G_PATH_FILE_INPUT);
+	clean_file(G_PATH_FILE_CONFIGURE);
 
 	FILE *file;
-	if (!(file = fopen(G_PATH_FILE_INPUT, "a")))
+	if (!(file = fopen(G_PATH_FILE_CONFIGURE, "a")))
 		yyerror("Failed to write data to file");
 
 	char *status;
@@ -467,7 +467,7 @@ int get_minutes_from_time(char *origin_time) {
 
 void monitoring_events() {
 	//char *time_ = get_time("%H:%M");
-	char *time_ = read_file("time.txt");
+	char *time_ = read_file(G_PATH_FILE_TIME);
 
 	if (time_[4] == '\n')
 		time_[4] = '\0';
@@ -488,7 +488,7 @@ void monitoring_events() {
 void monitoring_condition() {
 	int index;
 	bool time_compare = true;
-	char *time_ = read_file("time.txt");
+	char *time_ = read_file(G_PATH_FILE_TIME);
 
 	for (int i = 0; i <= q_count_conditions; i++) {
 		index = get_index_device(conditions[i].name);
