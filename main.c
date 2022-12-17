@@ -88,17 +88,6 @@ bool check_action_device(char *name, char *action) {
 }
 
 
-bool check_state_device(char *name, char *state) {
-	int index = get_index_device(name);
-
-	for (int i = 0; i < COUNT_STATES; i++) {
-		if (devices[index].states[i] && strcmp(devices[index].states[i], state) == 0)
-			return true;
-	}
-	return false;
-}
-
-
 void turn_on_device(char *name) {	
 	const int index = get_index_device(name);
 	if (index == -1) 
@@ -162,15 +151,6 @@ void add_event(struct Event *event) {
 	events[q_count_events] = *event;
 	printf("[%s] added a new event for %s\n", event->name, event->time);
 	logger("INFO", "added a new event", event->name);
-}
-
-
-int get_index_event(char *name) {
-	for (int i = 0; i <= q_count_events; i++) {
-		if (strcmp(events[i].name, name) == 0)
-			return i;
-	}
-	return -1;
 }
 
 
@@ -319,22 +299,6 @@ char* get_time(char *format) {
 }
 
 
-void checking_condition(char *name) {
-	int index_device = get_index_device(name);
-	if (index_device == -1)
-		yyerror("Failed get index device");
-
-	if (devices[index_device].state) {
-		int index_condition = get_index_condition(name);
-		for (int i = 0; i < conditions[index_condition].count_events; i++)
-			processing_actions(&conditions[index_condition].events[i]);
-
-		devices[index_device].state = false;
-		update_configure();
-	}
-}
-
-
 void add_condition(struct Arguments *arguments) {
 	q_count_conditions++;
 
@@ -374,16 +338,6 @@ void add_event_condition(struct Event *event) {
 
 	condition_events[q_count_condition_events] = *event;
 	logger("INFO", "added a new event to condition", event->name);
-}
-
-
-int get_index_condition(char *name) {
-	for (int i = 0; i <= q_count_conditions; i++) {
-		if (strcmp(conditions[i].name, name) == 0) {
-			return i;
-		}
-	}
-	return -1;
 }
 
 

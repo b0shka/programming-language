@@ -3,8 +3,6 @@
 %}
 
 %code requires {
-	#include <stdbool.h>
-
 	struct Argument {
 		char *type;
 		char *value;

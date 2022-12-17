@@ -1,0 +1,5 @@
+[12:00] conditioner target
+[12:00] conditioner on
+[12:00] vacuum_cleaner vacuum
+[09:36] lamp on
+[09:36] teapot boil

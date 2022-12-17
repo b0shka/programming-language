@@ -17,8 +17,8 @@ actions			on|off|open|vacuum|boil|target|sos|host_notification
 %%
 
 FILE_OUTPUT						{ return FILE_OUTPUT; }
-device|DEVICE					{ return DEVICE; }
-time|TIME						{ return TIME; }
+device							{ return DEVICE; }
+time							{ return TIME; }
 if								{ return IF; }
 and								{ return AND; }
 
